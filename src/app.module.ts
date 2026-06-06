@@ -18,6 +18,7 @@ import { FilesModule } from './modules/files/files.module';
 import { TenancyModule } from './modules/tenancy/tenancy.module';
 import { SedesModule } from './modules/sedes/sedes.module';
 import { PuntosRetiroModule } from './modules/puntos-retiro/puntos-retiro.module';
+import { CategoriasMenuModule } from './modules/categorias-menu/categorias-menu.module';
 
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { ObservabilityModule } from './infra/observability/observability.module';
@@ -53,6 +54,7 @@ import { ObservabilityModule } from './infra/observability/observability.module'
     ObservabilityModule,
     SedesModule,
     PuntosRetiroModule,
+    CategoriasMenuModule,
   ],
   controllers: [AppController],
   providers: [

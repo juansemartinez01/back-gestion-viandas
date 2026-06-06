@@ -1,0 +1,367 @@
+{
+  "info": {
+    "_postman_id": "4ff2d0a6-02f0-49c6-8769-cdb73f35618a",
+    "name": "Backend Rochester - Categorias Menu",
+    "description": "Coleccion para probar los endpoints del modulo Categorias de Menu. Usa {{url}}, {{token}}, {{tenant}} y {{categoria_menu_id}}.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "url",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "tenant",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "tenant_key",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "categoria_menu_id",
+      "value": "00000000-0000-0000-0000-000000000000",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Admin Categorias Menu",
+      "description": "Endpoints protegidos por JWT y roles. Listar y ver detalle aceptan administrador/supervisor; crear, actualizar, activar, inactivar y eliminar requieren administrador.",
+      "item": [
+        {
+          "name": "Listar categorias de menu",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/admin/categorias-menu?page=1&limit=20&q=entradas&activa=true&sortBy=nombre&sortOrder=ASC",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "categorias-menu"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Pagina desde 1."
+                },
+                {
+                  "key": "limit",
+                  "value": "20",
+                  "description": "Cantidad por pagina. Maximo definido por PageQueryDto."
+                },
+                {
+                  "key": "q",
+                  "value": "entradas",
+                  "description": "Busqueda por nombre."
+                },
+                {
+                  "key": "activa",
+                  "value": "true",
+                  "description": "Filtra categorias activas o inactivas."
+                },
+                {
+                  "key": "sortBy",
+                  "value": "nombre",
+                  "description": "Permitidos: nombre, orden_visualizacion, created_at."
+                },
+                {
+                  "key": "sortOrder",
+                  "value": "ASC",
+                  "description": "Permitidos: ASC, DESC."
+                }
+              ]
+            },
+            "description": "GET /admin/categorias-menu. Devuelve una respuesta paginada."
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener categoria de menu por id",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/admin/categorias-menu/{{categoria_menu_id}}",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "categorias-menu",
+                "{{categoria_menu_id}}"
+              ]
+            },
+            "description": "GET /admin/categorias-menu/:id. Requiere que la categoria pertenezca al tenant actual."
+          },
+          "response": []
+        },
+        {
+          "name": "Crear categoria de menu",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Entradas\",\n  \"descripcion\": \"Opciones iniciales del menu.\",\n  \"orden_visualizacion\": 1\n}"
+            },
+            "url": {
+              "raw": "{{url}}/admin/categorias-menu",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "categorias-menu"
+              ]
+            },
+            "description": "POST /admin/categorias-menu. El nombre debe ser unico dentro del tenant."
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar categoria de menu",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Entradas y Aperitivos\",\n  \"descripcion\": \"Opciones para comenzar el menu.\",\n  \"orden_visualizacion\": 2\n}"
+            },
+            "url": {
+              "raw": "{{url}}/admin/categorias-menu/{{categoria_menu_id}}",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "categorias-menu",
+                "{{categoria_menu_id}}"
+              ]
+            },
+            "description": "PATCH /admin/categorias-menu/:id. Todos los campos del body son opcionales."
+          },
+          "response": []
+        },
+        {
+          "name": "Activar categoria de menu",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/admin/categorias-menu/{{categoria_menu_id}}/activar",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "categorias-menu",
+                "{{categoria_menu_id}}",
+                "activar"
+              ]
+            },
+            "description": "PATCH /admin/categorias-menu/:id/activar. Devuelve 409 si ya esta activa."
+          },
+          "response": []
+        },
+        {
+          "name": "Inactivar categoria de menu",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/admin/categorias-menu/{{categoria_menu_id}}/inactivar",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "categorias-menu",
+                "{{categoria_menu_id}}",
+                "inactivar"
+              ]
+            },
+            "description": "PATCH /admin/categorias-menu/:id/inactivar. Devuelve 409 si ya esta inactiva."
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar categoria de menu",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/admin/categorias-menu/{{categoria_menu_id}}",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "categorias-menu",
+                "{{categoria_menu_id}}"
+              ]
+            },
+            "description": "DELETE /admin/categorias-menu/:id. La categoria debe estar inactiva antes de eliminarse."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Public Categorias Menu",
+      "description": "Endpoint publico registrado por CategoriasMenuModule. No usa JWT, pero requiere tenant para aplicar el scope del servicio.",
+      "item": [
+        {
+          "name": "Listar categorias publicas activas",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/public/categorias-menu",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "public",
+                "categorias-menu"
+              ]
+            },
+            "description": "GET /public/categorias-menu. Devuelve categorias activas ordenadas por orden_visualizacion y nombre."
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
