@@ -17,7 +17,6 @@ export class AddTenantIdCoreTables1769990000000 implements MigrationInterface {
       ON "users" ("tenant_id")
     `);
 
-    // opcional/recomendado: búsquedas por email dentro del tenant
     await queryRunner.query(`
       CREATE INDEX IF NOT EXISTS "IDX_users_tenant_id_email"
       ON "users" ("tenant_id", "email")
@@ -36,7 +35,6 @@ export class AddTenantIdCoreTables1769990000000 implements MigrationInterface {
       ON "refresh_tokens" ("tenant_id")
     `);
 
-    // opcional/recomendado: queries por user_id dentro del tenant
     await queryRunner.query(`
       CREATE INDEX IF NOT EXISTS "IDX_refresh_tokens_tenant_id_user_id"
       ON "refresh_tokens" ("tenant_id", "user_id")
@@ -44,33 +42,46 @@ export class AddTenantIdCoreTables1769990000000 implements MigrationInterface {
 
     // =========================
     // audit_logs (tenant-scoped)
+    // AuditLogsInit (timestamp 1769994196078) crea esta tabla DESPUÉS de esta
+    // migración. Cuando la tabla ya existe (por AuditLogsInit o una DB preexistente),
+    // el ADD COLUMN IF NOT EXISTS es un no-op seguro. Si todavía no existe, la
+    // saltamos: AuditLogsInit la creará con tenant_id incluido desde el CREATE TABLE.
     // =========================
-    await queryRunner.query(`
-      ALTER TABLE "audit_logs"
-      ADD COLUMN IF NOT EXISTS "tenant_id" uuid
-    `);
+    const auditLogsExists = await queryRunner.hasTable('audit_logs');
+    if (auditLogsExists) {
+      await queryRunner.query(`
+        ALTER TABLE "audit_logs"
+        ADD COLUMN IF NOT EXISTS "tenant_id" uuid
+      `);
 
-    await queryRunner.query(`
-      CREATE INDEX IF NOT EXISTS "IDX_audit_logs_tenant_id"
-      ON "audit_logs" ("tenant_id")
-    `);
+      await queryRunner.query(`
+        CREATE INDEX IF NOT EXISTS "IDX_audit_logs_tenant_id"
+        ON "audit_logs" ("tenant_id")
+      `);
 
-    // opcional/recomendado: para filtros típicos (tenant + created_at)
-    await queryRunner.query(`
-      CREATE INDEX IF NOT EXISTS "IDX_audit_logs_tenant_id_created_at"
-      ON "audit_logs" ("tenant_id", "created_at")
-    `);
+      await queryRunner.query(`
+        CREATE INDEX IF NOT EXISTS "IDX_audit_logs_tenant_id_created_at"
+        ON "audit_logs" ("tenant_id", "created_at")
+      `);
+    }
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    // audit_logs
-    await queryRunner.query(
-      `DROP INDEX IF EXISTS "IDX_audit_logs_tenant_id_created_at"`,
-    );
-    await queryRunner.query(`DROP INDEX IF EXISTS "IDX_audit_logs_tenant_id"`);
-    await queryRunner.query(
-      `ALTER TABLE "audit_logs" DROP COLUMN IF EXISTS "tenant_id"`,
-    );
+    // audit_logs — solo revertir si la tabla existe
+    const auditLogsExists = await queryRunner.hasTable('audit_logs');
+    if (auditLogsExists) {
+      await queryRunner.query(
+        `DROP INDEX IF EXISTS "IDX_audit_logs_tenant_id_created_at"`,
+      );
+      await queryRunner.query(
+        `DROP INDEX IF EXISTS "IDX_audit_logs_tenant_id"`,
+      );
+      // No eliminar la columna si fue creada por AuditLogsInit (el CREATE TABLE ya la trae)
+      // Solo eliminarla si la columna existe y fue agregada por esta migración
+      await queryRunner.query(
+        `ALTER TABLE "audit_logs" DROP COLUMN IF EXISTS "tenant_id"`,
+      );
+    }
 
     // refresh_tokens
     await queryRunner.query(

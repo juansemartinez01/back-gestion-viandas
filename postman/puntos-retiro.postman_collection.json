@@ -1,0 +1,384 @@
+{
+  "info": {
+    "_postman_id": "7a3d1728-2b60-4906-9bb0-22b839d54380",
+    "name": "Backend Rochester - Puntos Retiro",
+    "description": "Coleccion para probar los endpoints del modulo Puntos de Retiro. Usa {{url}}, {{token}}, {{tenant}}, {{sede_id}} y {{punto_retiro_id}}.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "url",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "tenant",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "tenant_key",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "sede_id",
+      "value": "00000000-0000-0000-0000-000000000000",
+      "type": "string"
+    },
+    {
+      "key": "punto_retiro_id",
+      "value": "00000000-0000-0000-0000-000000000000",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Admin Puntos Retiro",
+      "description": "Endpoints protegidos por JWT y roles. Listar y ver detalle aceptan administrador/supervisor; crear, actualizar, activar, inactivar y eliminar requieren administrador.",
+      "item": [
+        {
+          "name": "Listar puntos de retiro",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/admin/puntos-retiro?page=1&limit=20&q=mostrador&sede_id={{sede_id}}&activo=true&sortBy=nombre&sortOrder=ASC",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "puntos-retiro"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Pagina desde 1."
+                },
+                {
+                  "key": "limit",
+                  "value": "20",
+                  "description": "Cantidad por pagina. Maximo definido por PageQueryDto."
+                },
+                {
+                  "key": "q",
+                  "value": "mostrador",
+                  "description": "Busqueda por nombre."
+                },
+                {
+                  "key": "sede_id",
+                  "value": "{{sede_id}}",
+                  "description": "Filtra por sede."
+                },
+                {
+                  "key": "activo",
+                  "value": "true",
+                  "description": "Filtra puntos activos o inactivos."
+                },
+                {
+                  "key": "sortBy",
+                  "value": "nombre",
+                  "description": "Permitidos: nombre, orden_visualizacion, created_at."
+                },
+                {
+                  "key": "sortOrder",
+                  "value": "ASC",
+                  "description": "Permitidos: ASC, DESC."
+                }
+              ]
+            },
+            "description": "GET /admin/puntos-retiro. Devuelve una respuesta paginada."
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener punto de retiro por id",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/admin/puntos-retiro/{{punto_retiro_id}}",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "puntos-retiro",
+                "{{punto_retiro_id}}"
+              ]
+            },
+            "description": "GET /admin/puntos-retiro/:id. Requiere que el punto pertenezca al tenant actual."
+          },
+          "response": []
+        },
+        {
+          "name": "Crear punto de retiro",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sede_id\": \"{{sede_id}}\",\n  \"nombre\": \"Mostrador Principal\",\n  \"descripcion\": \"Retiro de pedidos por caja central.\",\n  \"activo\": true,\n  \"orden_visualizacion\": 1,\n  \"observaciones\": \"Disponible de lunes a viernes de 9 a 18 hs.\"\n}"
+            },
+            "url": {
+              "raw": "{{url}}/admin/puntos-retiro",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "puntos-retiro"
+              ]
+            },
+            "description": "POST /admin/puntos-retiro. La sede debe existir, pertenecer al tenant y estar activa. El nombre debe ser unico dentro de la sede."
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar punto de retiro",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Mostrador Principal Renovado\",\n  \"descripcion\": \"Retiro de pedidos web y presenciales.\",\n  \"activo\": true,\n  \"orden_visualizacion\": 2,\n  \"observaciones\": \"Prioridad para pedidos ya abonados.\"\n}"
+            },
+            "url": {
+              "raw": "{{url}}/admin/puntos-retiro/{{punto_retiro_id}}",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "puntos-retiro",
+                "{{punto_retiro_id}}"
+              ]
+            },
+            "description": "PATCH /admin/puntos-retiro/:id. Todos los campos del body son opcionales. No permite cambiar sede_id desde este endpoint."
+          },
+          "response": []
+        },
+        {
+          "name": "Activar punto de retiro",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/admin/puntos-retiro/{{punto_retiro_id}}/activar",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "puntos-retiro",
+                "{{punto_retiro_id}}",
+                "activar"
+              ]
+            },
+            "description": "PATCH /admin/puntos-retiro/:id/activar. Devuelve 409 si ya esta activo."
+          },
+          "response": []
+        },
+        {
+          "name": "Inactivar punto de retiro",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/admin/puntos-retiro/{{punto_retiro_id}}/inactivar",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "puntos-retiro",
+                "{{punto_retiro_id}}",
+                "inactivar"
+              ]
+            },
+            "description": "PATCH /admin/puntos-retiro/:id/inactivar. Devuelve 409 si ya esta inactivo."
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar punto de retiro",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/admin/puntos-retiro/{{punto_retiro_id}}",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "puntos-retiro",
+                "{{punto_retiro_id}}"
+              ]
+            },
+            "description": "DELETE /admin/puntos-retiro/:id. El punto debe estar inactivo antes de eliminarse."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Public Puntos Retiro",
+      "description": "Endpoint publico registrado por PuntosRetiroModule. No usa JWT, pero requiere tenant y sede_id.",
+      "item": [
+        {
+          "name": "Listar puntos de retiro publicos por sede",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/public/puntos-retiro?sede_id={{sede_id}}",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "public",
+                "puntos-retiro"
+              ],
+              "query": [
+                {
+                  "key": "sede_id",
+                  "value": "{{sede_id}}",
+                  "description": "UUID de la sede. Obligatorio."
+                }
+              ]
+            },
+            "description": "GET /public/puntos-retiro?sede_id=:sede_id. Devuelve puntos activos ordenados por orden_visualizacion y nombre."
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

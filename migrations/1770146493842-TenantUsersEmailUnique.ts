@@ -9,8 +9,8 @@ export class TenantUsersEmailUnique1770146493842 implements MigrationInterface {
         await queryRunner.query(`DROP INDEX "public"."IDX_97672ac88f789774dd47f7c8be"`);
         await queryRunner.query(`DROP INDEX "public"."IDX_users_tenant_id"`);
         await queryRunner.query(`DROP INDEX "public"."IDX_users_tenant_id_email"`);
-        await queryRunner.query(`DROP INDEX "public"."IDX_audit_logs_tenant_id"`);
-        await queryRunner.query(`DROP INDEX "public"."IDX_audit_logs_tenant_id_created_at"`);
+        await queryRunner.query(`DROP INDEX IF EXISTS "public"."IDX_audit_logs_tenant_id"`);
+        await queryRunner.query(`DROP INDEX IF EXISTS "public"."IDX_audit_logs_tenant_id_created_at"`);
         await queryRunner.query(`CREATE TABLE "file_objects" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "tenant_id" uuid, "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "deleted_at" TIMESTAMP WITH TIME ZONE, "owner_user_id" uuid, "original_name" character varying(260) NOT NULL, "mime" character varying(120) NOT NULL, "size_bytes" bigint NOT NULL, "bucket" character varying(120) NOT NULL, "key" character varying(600) NOT NULL, "visibility" character varying(20) NOT NULL DEFAULT 'private', "meta" jsonb, "etag" character varying(120), CONSTRAINT "PK_7b0aca4f7e155c5b2fad069669f" PRIMARY KEY ("id"))`);
         await queryRunner.query(`CREATE INDEX "IDX_1e1b09d809c807f6ac0ce789af" ON "file_objects" ("tenant_id") `);
         await queryRunner.query(`CREATE INDEX "IDX_e577c5052cb74b977fa9d11c87" ON "file_objects" ("owner_user_id") `);
@@ -40,8 +40,8 @@ export class TenantUsersEmailUnique1770146493842 implements MigrationInterface {
         await queryRunner.query(`DROP INDEX "public"."IDX_e577c5052cb74b977fa9d11c87"`);
         await queryRunner.query(`DROP INDEX "public"."IDX_1e1b09d809c807f6ac0ce789af"`);
         await queryRunner.query(`DROP TABLE "file_objects"`);
-        await queryRunner.query(`CREATE INDEX "IDX_audit_logs_tenant_id_created_at" ON "audit_logs" ("created_at", "tenant_id") `);
-        await queryRunner.query(`CREATE INDEX "IDX_audit_logs_tenant_id" ON "audit_logs" ("tenant_id") `);
+        await queryRunner.query(`CREATE INDEX IF NOT EXISTS "IDX_audit_logs_tenant_id_created_at" ON "audit_logs" ("created_at", "tenant_id") `);
+        await queryRunner.query(`CREATE INDEX IF NOT EXISTS "IDX_audit_logs_tenant_id" ON "audit_logs" ("tenant_id") `);
         await queryRunner.query(`CREATE INDEX "IDX_users_tenant_id_email" ON "users" ("email", "tenant_id") `);
         await queryRunner.query(`CREATE INDEX "IDX_users_tenant_id" ON "users" ("tenant_id") `);
         await queryRunner.query(`CREATE UNIQUE INDEX "IDX_97672ac88f789774dd47f7c8be" ON "users" ("email") `);

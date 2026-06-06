@@ -1,0 +1,920 @@
+{
+  "info": {
+    "_postman_id": "5f96730d-6b55-4d4f-95a0-d52fba515ed3",
+    "name": "Backend Rochester - Auth, Usuarios, Roles, Audit y Files",
+    "description": "Coleccion para importar en Postman con endpoints generales del backend. No incluye endpoints del modulo Sedes.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "url",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "tenant",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "tenant_key",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "refresh_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "user_id",
+      "value": "00000000-0000-0000-0000-000000000000",
+      "type": "string"
+    },
+    {
+      "key": "role_id",
+      "value": "00000000-0000-0000-0000-000000000000",
+      "type": "string"
+    },
+    {
+      "key": "audit_log_id",
+      "value": "00000000-0000-0000-0000-000000000000",
+      "type": "string"
+    },
+    {
+      "key": "public_id",
+      "value": "sample-public-id",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "description": "Registro, login, refresh, logout y endpoints de sesion.",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"nuevo.usuario@rochester.com\",\n  \"password\": \"Password123\"\n}"
+            },
+            "url": {
+              "raw": "{{url}}/auth/register",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "auth",
+                "register"
+              ]
+            },
+            "description": "Crea un usuario en el tenant actual con rol user."
+          },
+          "response": []
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.access_token) pm.collectionVariables.set('token', json.access_token);",
+                  "if (json.refresh_token) pm.collectionVariables.set('refresh_token', json.refresh_token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@rochester.com\",\n  \"password\": \"Password123\"\n}"
+            },
+            "url": {
+              "raw": "{{url}}/auth/login",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Obtiene access_token y refresh_token. El test de Postman guarda ambos en variables de coleccion."
+          },
+          "response": []
+        },
+        {
+          "name": "Refresh token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.access_token) pm.collectionVariables.set('token', json.access_token);",
+                  "if (json.refresh_token) pm.collectionVariables.set('refresh_token', json.refresh_token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refresh_token\": \"{{refresh_token}}\"\n}"
+            },
+            "url": {
+              "raw": "{{url}}/auth/refresh",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "auth",
+                "refresh"
+              ]
+            },
+            "description": "Rota refresh_token y devuelve un nuevo par de tokens."
+          },
+          "response": []
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refresh_token\": \"{{refresh_token}}\"\n}"
+            },
+            "url": {
+              "raw": "{{url}}/auth/logout",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "auth",
+                "logout"
+              ]
+            },
+            "description": "Revoca el refresh_token activo."
+          },
+          "response": []
+        },
+        {
+          "name": "Me",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/auth/me",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "auth",
+                "me"
+              ]
+            },
+            "description": "Valida que el access_token sea valido."
+          },
+          "response": []
+        },
+        {
+          "name": "Admin only",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/auth/admin-only",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "auth",
+                "admin-only"
+              ]
+            },
+            "description": "Endpoint protegido por rol admin."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Admin Users",
+      "description": "Endpoints protegidos con JWT y rol admin.",
+      "item": [
+        {
+          "name": "Listar usuarios",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/admin/users?page=1&limit=20&q=admin&includeDeleted=false",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "users"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Pagina desde 1."
+                },
+                {
+                  "key": "limit",
+                  "value": "20",
+                  "description": "Cantidad por pagina. El service limita a 100."
+                },
+                {
+                  "key": "q",
+                  "value": "admin",
+                  "description": "Busca por email."
+                },
+                {
+                  "key": "includeDeleted",
+                  "value": "false",
+                  "description": "true para incluir usuarios eliminados logicamente."
+                }
+              ]
+            },
+            "description": "GET /admin/users."
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener usuario por id",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/admin/users/{{user_id}}",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "users",
+                "{{user_id}}"
+              ]
+            },
+            "description": "GET /admin/users/:id. Incluye usuarios eliminados para el detalle admin."
+          },
+          "response": []
+        },
+        {
+          "name": "Crear usuario",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"operador@rochester.com\",\n  \"password\": \"Password123\",\n  \"roles\": [\n    \"user\"\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{url}}/admin/users",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "users"
+              ]
+            },
+            "description": "POST /admin/users. Si no se envian roles, asigna user."
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar usuario",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"operador.actualizado@rochester.com\",\n  \"password\": \"Password456\",\n  \"is_active\": true\n}"
+            },
+            "url": {
+              "raw": "{{url}}/admin/users/{{user_id}}",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "users",
+                "{{user_id}}"
+              ]
+            },
+            "description": "PATCH /admin/users/:id. Todos los campos son opcionales."
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar password de usuario",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"password\": \"NuevaPassword123\"\n}"
+            },
+            "url": {
+              "raw": "{{url}}/admin/users/{{user_id}}/password",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "users",
+                "{{user_id}}",
+                "password"
+              ]
+            },
+            "description": "PATCH /admin/users/:id/password."
+          },
+          "response": []
+        },
+        {
+          "name": "Asignar roles a usuario",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"roles\": [\n    \"admin\",\n    \"user\"\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{url}}/admin/users/{{user_id}}/roles",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "users",
+                "{{user_id}}",
+                "roles"
+              ]
+            },
+            "description": "POST /admin/users/:id/roles. Reemplaza los roles del usuario."
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar usuario",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/admin/users/{{user_id}}",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "users",
+                "{{user_id}}"
+              ]
+            },
+            "description": "DELETE /admin/users/:id. Soft delete. No permite eliminar el admin seed."
+          },
+          "response": []
+        },
+        {
+          "name": "Restaurar usuario",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/admin/users/{{user_id}}/restore",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "users",
+                "{{user_id}}",
+                "restore"
+              ]
+            },
+            "description": "POST /admin/users/:id/restore."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Admin Roles",
+      "description": "Endpoints protegidos con JWT y rol admin. Los roles son globales.",
+      "item": [
+        {
+          "name": "Listar roles",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/admin/roles",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "roles"
+              ]
+            },
+            "description": "GET /admin/roles."
+          },
+          "response": []
+        },
+        {
+          "name": "Crear rol",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"supervisor\"\n}"
+            },
+            "url": {
+              "raw": "{{url}}/admin/roles",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "roles"
+              ]
+            },
+            "description": "POST /admin/roles. name min 2 max 40."
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar rol",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"coordinador\"\n}"
+            },
+            "url": {
+              "raw": "{{url}}/admin/roles/{{role_id}}",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "roles",
+                "{{role_id}}"
+              ]
+            },
+            "description": "PATCH /admin/roles/:id."
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar rol",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/admin/roles/{{role_id}}",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "roles",
+                "{{role_id}}"
+              ]
+            },
+            "description": "DELETE /admin/roles/:id. No permite eliminar el rol admin."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Admin Audit Logs",
+      "description": "Endpoints protegidos con JWT y rol admin.",
+      "item": [
+        {
+          "name": "Listar audit logs",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/admin/audit-logs?page=1&limit=20&kind=admin&q=user&entity=user&action=create&status_code=201&order=DESC",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "audit-logs"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20",
+                  "description": "El service limita a 100."
+                },
+                {
+                  "key": "kind",
+                  "value": "admin",
+                  "description": "admin | error_5xx"
+                },
+                {
+                  "key": "q",
+                  "value": "user",
+                  "description": "Busca en actor_email, action, entity, path y request_id."
+                },
+                {
+                  "key": "actor_user_id",
+                  "value": "{{user_id}}",
+                  "disabled": true
+                },
+                {
+                  "key": "target_user_id",
+                  "value": "{{user_id}}",
+                  "disabled": true
+                },
+                {
+                  "key": "entity",
+                  "value": "user"
+                },
+                {
+                  "key": "action",
+                  "value": "create"
+                },
+                {
+                  "key": "status_code",
+                  "value": "201"
+                },
+                {
+                  "key": "from",
+                  "value": "2026-06-01T00:00:00.000Z",
+                  "disabled": true
+                },
+                {
+                  "key": "to",
+                  "value": "2026-06-30T23:59:59.999Z",
+                  "disabled": true
+                },
+                {
+                  "key": "order",
+                  "value": "DESC",
+                  "description": "ASC | DESC"
+                }
+              ]
+            },
+            "description": "GET /admin/audit-logs."
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener audit log por id",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/admin/audit-logs/{{audit_log_id}}",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "audit-logs",
+                "{{audit_log_id}}"
+              ]
+            },
+            "description": "GET /admin/audit-logs/:id."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Files",
+      "description": "Endpoints de archivos. Usan tenant_key para el provider externo cuando esta configurado.",
+      "item": [
+        {
+          "name": "Subir archivo",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{url}}/files/upload",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "files",
+                "upload"
+              ]
+            },
+            "description": "POST /files/upload. Form-data con campo file."
+          },
+          "response": []
+        },
+        {
+          "name": "Listar archivos",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/files/list",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "files",
+                "list"
+              ]
+            },
+            "description": "GET /files/list."
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar archivo",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/files/delete/{{public_id}}",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "files",
+                "delete",
+                "{{public_id}}"
+              ]
+            },
+            "description": "DELETE /files/delete/:publicId."
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
