@@ -1,0 +1,383 @@
+{
+  "info": {
+    "_postman_id": "e70aa9ef-96d4-4bf3-98e7-e5f9717e3c07",
+    "name": "Backend Rochester - Sedes",
+    "description": "Coleccion para probar los endpoints del modulo Sedes. Usa {{url}} como base URL, {{token}} para Bearer auth, {{tenant}} para x-tenant-id y {{sede_id}} para endpoints por id.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": []
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": []
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "url",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "tenant",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "tenant_key",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "sede_id",
+      "value": "00000000-0000-0000-0000-000000000000",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Admin Sedes",
+      "description": "Endpoints protegidos por JWT y roles. Listar y ver detalle aceptan administrador/supervisor; crear, actualizar, activar, inactivar y eliminar requieren administrador.",
+      "item": [
+        {
+          "name": "Listar sedes",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/admin/sedes?page=1&limit=20&q=central&sortBy=nombre&sortOrder=ASC&activa=true",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "sedes"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Pagina desde 1."
+                },
+                {
+                  "key": "limit",
+                  "value": "20",
+                  "description": "Cantidad por pagina. Maximo 200."
+                },
+                {
+                  "key": "q",
+                  "value": "central",
+                  "description": "Busqueda por nombre o direccion."
+                },
+                {
+                  "key": "sortBy",
+                  "value": "nombre",
+                  "description": "Permitidos: nombre, orden_visualizacion, created_at."
+                },
+                {
+                  "key": "sortOrder",
+                  "value": "ASC",
+                  "description": "Permitidos: ASC, DESC."
+                },
+                {
+                  "key": "activa",
+                  "value": "true",
+                  "description": "Filtra sedes activas o inactivas."
+                }
+              ]
+            },
+            "description": "GET /admin/sedes. Devuelve una respuesta paginada."
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener sede por id",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/admin/sedes/{{sede_id}}",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "sedes",
+                "{{sede_id}}"
+              ]
+            },
+            "description": "GET /admin/sedes/:id. Requiere que la sede pertenezca al tenant actual."
+          },
+          "response": []
+        },
+        {
+          "name": "Crear sede",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Sede Central\",\n  \"direccion\": \"Av. Pellegrini 1234, Rosario, Santa Fe\",\n  \"telefono_contacto\": \"+54 341 555-1234\",\n  \"observaciones\": \"Atencion administrativa y aulas principales.\",\n  \"orden_visualizacion\": 1\n}"
+            },
+            "url": {
+              "raw": "{{url}}/admin/sedes",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "sedes"
+              ]
+            },
+            "description": "POST /admin/sedes. El nombre debe ser unico dentro del tenant."
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar sede",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Sede Central Renovada\",\n  \"direccion\": \"Av. Pellegrini 1250, Rosario, Santa Fe\",\n  \"telefono_contacto\": \"+54 341 555-5678\",\n  \"observaciones\": \"Horario extendido durante inscripciones.\",\n  \"orden_visualizacion\": 2\n}"
+            },
+            "url": {
+              "raw": "{{url}}/admin/sedes/{{sede_id}}",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "sedes",
+                "{{sede_id}}"
+              ]
+            },
+            "description": "PATCH /admin/sedes/:id. Todos los campos del body son opcionales."
+          },
+          "response": []
+        },
+        {
+          "name": "Activar sede",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/admin/sedes/{{sede_id}}/activar",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "sedes",
+                "{{sede_id}}",
+                "activar"
+              ]
+            },
+            "description": "PATCH /admin/sedes/:id/activar. Devuelve 409 si la sede ya esta activa."
+          },
+          "response": []
+        },
+        {
+          "name": "Inactivar sede",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/admin/sedes/{{sede_id}}/inactivar",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "sedes",
+                "{{sede_id}}",
+                "inactivar"
+              ]
+            },
+            "description": "PATCH /admin/sedes/:id/inactivar. Devuelve 409 si la sede ya esta inactiva."
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar sede",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/admin/sedes/{{sede_id}}",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "sedes",
+                "{{sede_id}}"
+              ]
+            },
+            "description": "DELETE /admin/sedes/:id. La sede debe estar inactiva antes de eliminarse."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Public Sedes",
+      "description": "Endpoint publico registrado por SedesModule. No usa JWT, pero requiere tenant para aplicar el scope del servicio.",
+      "item": [
+        {
+          "name": "Listar sedes publicas activas",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/public/sedes",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "public",
+                "sedes"
+              ]
+            },
+            "description": "GET /public/sedes. Devuelve sedes activas ordenadas por orden_visualizacion y nombre."
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
