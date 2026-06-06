@@ -1,0 +1,367 @@
+{
+  "info": {
+    "_postman_id": "b383e8f3-9c47-4e7a-9099-a86ed9891687",
+    "name": "Backend Rochester - Etiquetas Menu",
+    "description": "Coleccion para probar los endpoints del modulo Etiquetas de Menu. Usa {{url}}, {{token}}, {{tenant}} y {{etiqueta_menu_id}}.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "url",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "tenant",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "tenant_key",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "etiqueta_menu_id",
+      "value": "00000000-0000-0000-0000-000000000000",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Admin Etiquetas Menu",
+      "description": "Endpoints protegidos por JWT y roles. Listar y ver detalle aceptan administrador/supervisor; crear, actualizar, activar, inactivar y eliminar requieren administrador.",
+      "item": [
+        {
+          "name": "Listar etiquetas de menu",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/admin/etiquetas-menu?page=1&limit=20&q=vegetariano&activa=true&sortBy=nombre&sortOrder=ASC",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "etiquetas-menu"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Pagina desde 1."
+                },
+                {
+                  "key": "limit",
+                  "value": "20",
+                  "description": "Cantidad por pagina. Maximo definido por PageQueryDto."
+                },
+                {
+                  "key": "q",
+                  "value": "vegetariano",
+                  "description": "Busqueda por nombre."
+                },
+                {
+                  "key": "activa",
+                  "value": "true",
+                  "description": "Filtra etiquetas activas o inactivas."
+                },
+                {
+                  "key": "sortBy",
+                  "value": "nombre",
+                  "description": "Permitidos: nombre, orden_visualizacion, created_at."
+                },
+                {
+                  "key": "sortOrder",
+                  "value": "ASC",
+                  "description": "Permitidos: ASC, DESC."
+                }
+              ]
+            },
+            "description": "GET /admin/etiquetas-menu. Devuelve una respuesta paginada."
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener etiqueta de menu por id",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/admin/etiquetas-menu/{{etiqueta_menu_id}}",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "etiquetas-menu",
+                "{{etiqueta_menu_id}}"
+              ]
+            },
+            "description": "GET /admin/etiquetas-menu/:id. Requiere que la etiqueta pertenezca al tenant actual."
+          },
+          "response": []
+        },
+        {
+          "name": "Crear etiqueta de menu",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Vegetariano\",\n  \"descripcion\": \"Opciones sin carnes.\",\n  \"orden_visualizacion\": 1\n}"
+            },
+            "url": {
+              "raw": "{{url}}/admin/etiquetas-menu",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "etiquetas-menu"
+              ]
+            },
+            "description": "POST /admin/etiquetas-menu. El nombre debe ser unico dentro del tenant."
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar etiqueta de menu",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Sin TACC\",\n  \"descripcion\": \"Opciones aptas para personas celiacas.\",\n  \"orden_visualizacion\": 2\n}"
+            },
+            "url": {
+              "raw": "{{url}}/admin/etiquetas-menu/{{etiqueta_menu_id}}",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "etiquetas-menu",
+                "{{etiqueta_menu_id}}"
+              ]
+            },
+            "description": "PATCH /admin/etiquetas-menu/:id. Todos los campos del body son opcionales."
+          },
+          "response": []
+        },
+        {
+          "name": "Activar etiqueta de menu",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/admin/etiquetas-menu/{{etiqueta_menu_id}}/activar",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "etiquetas-menu",
+                "{{etiqueta_menu_id}}",
+                "activar"
+              ]
+            },
+            "description": "PATCH /admin/etiquetas-menu/:id/activar. Devuelve 409 si ya esta activa."
+          },
+          "response": []
+        },
+        {
+          "name": "Inactivar etiqueta de menu",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/admin/etiquetas-menu/{{etiqueta_menu_id}}/inactivar",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "etiquetas-menu",
+                "{{etiqueta_menu_id}}",
+                "inactivar"
+              ]
+            },
+            "description": "PATCH /admin/etiquetas-menu/:id/inactivar. Devuelve 409 si ya esta inactiva."
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar etiqueta de menu",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/admin/etiquetas-menu/{{etiqueta_menu_id}}",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "etiquetas-menu",
+                "{{etiqueta_menu_id}}"
+              ]
+            },
+            "description": "DELETE /admin/etiquetas-menu/:id. La etiqueta debe estar inactiva antes de eliminarse."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Public Etiquetas Menu",
+      "description": "Endpoint publico registrado por EtiquetasMenuModule. No usa JWT, pero requiere tenant para aplicar el scope del servicio.",
+      "item": [
+        {
+          "name": "Listar etiquetas publicas activas",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/public/etiquetas-menu",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "public",
+                "etiquetas-menu"
+              ]
+            },
+            "description": "GET /public/etiquetas-menu. Devuelve etiquetas activas ordenadas por orden_visualizacion y nombre."
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
