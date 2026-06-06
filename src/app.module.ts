@@ -20,6 +20,7 @@ import { SedesModule } from './modules/sedes/sedes.module';
 import { PuntosRetiroModule } from './modules/puntos-retiro/puntos-retiro.module';
 import { CategoriasMenuModule } from './modules/categorias-menu/categorias-menu.module';
 import { EtiquetasMenuModule } from './modules/etiquetas-menu/etiquetas-menu.module';
+import { AlergenosModule } from './modules/alergenos/alergenos.module';
 
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { ObservabilityModule } from './infra/observability/observability.module';
@@ -57,6 +58,7 @@ import { ObservabilityModule } from './infra/observability/observability.module'
     PuntosRetiroModule,
     CategoriasMenuModule,
     EtiquetasMenuModule,
+    AlergenosModule,
   ],
   controllers: [AppController],
   providers: [

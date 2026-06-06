@@ -1,0 +1,367 @@
+{
+  "info": {
+    "_postman_id": "c3ac24a7-f5ea-447a-bc1a-c65b3f6c5c4a",
+    "name": "Backend Rochester - Alergenos",
+    "description": "Coleccion para probar los endpoints del modulo Alergenos. Usa {{url}}, {{token}}, {{tenant}} y {{alergeno_id}}.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "url",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "tenant",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "tenant_key",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "alergeno_id",
+      "value": "00000000-0000-0000-0000-000000000000",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Admin Alergenos",
+      "description": "Endpoints protegidos por JWT y roles. Listar y ver detalle aceptan administrador/supervisor; crear, actualizar, activar, inactivar y eliminar requieren administrador.",
+      "item": [
+        {
+          "name": "Listar alergenos",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/admin/alergenos?page=1&limit=20&q=gluten&activo=true&sortBy=nombre&sortOrder=ASC",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "alergenos"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Pagina desde 1."
+                },
+                {
+                  "key": "limit",
+                  "value": "20",
+                  "description": "Cantidad por pagina. Maximo definido por PageQueryDto."
+                },
+                {
+                  "key": "q",
+                  "value": "gluten",
+                  "description": "Busqueda por nombre."
+                },
+                {
+                  "key": "activo",
+                  "value": "true",
+                  "description": "Filtra alergenos activos o inactivos."
+                },
+                {
+                  "key": "sortBy",
+                  "value": "nombre",
+                  "description": "Permitidos: nombre, created_at."
+                },
+                {
+                  "key": "sortOrder",
+                  "value": "ASC",
+                  "description": "Permitidos: ASC, DESC."
+                }
+              ]
+            },
+            "description": "GET /admin/alergenos. Devuelve una respuesta paginada."
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener alergeno por id",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/admin/alergenos/{{alergeno_id}}",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "alergenos",
+                "{{alergeno_id}}"
+              ]
+            },
+            "description": "GET /admin/alergenos/:id. Requiere que el alergeno pertenezca al tenant actual."
+          },
+          "response": []
+        },
+        {
+          "name": "Crear alergeno",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Gluten\",\n  \"descripcion\": \"Contiene trigo, avena, cebada o centeno.\"\n}"
+            },
+            "url": {
+              "raw": "{{url}}/admin/alergenos",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "alergenos"
+              ]
+            },
+            "description": "POST /admin/alergenos. El nombre debe ser unico dentro del tenant."
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar alergeno",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Lactosa\",\n  \"descripcion\": \"Contiene leche o derivados lacteos.\"\n}"
+            },
+            "url": {
+              "raw": "{{url}}/admin/alergenos/{{alergeno_id}}",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "alergenos",
+                "{{alergeno_id}}"
+              ]
+            },
+            "description": "PATCH /admin/alergenos/:id. Todos los campos del body son opcionales."
+          },
+          "response": []
+        },
+        {
+          "name": "Activar alergeno",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/admin/alergenos/{{alergeno_id}}/activar",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "alergenos",
+                "{{alergeno_id}}",
+                "activar"
+              ]
+            },
+            "description": "PATCH /admin/alergenos/:id/activar. Devuelve 409 si ya esta activo."
+          },
+          "response": []
+        },
+        {
+          "name": "Inactivar alergeno",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/admin/alergenos/{{alergeno_id}}/inactivar",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "alergenos",
+                "{{alergeno_id}}",
+                "inactivar"
+              ]
+            },
+            "description": "PATCH /admin/alergenos/:id/inactivar. Devuelve 409 si ya esta inactivo."
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar alergeno",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/admin/alergenos/{{alergeno_id}}",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "alergenos",
+                "{{alergeno_id}}"
+              ]
+            },
+            "description": "DELETE /admin/alergenos/:id. El alergeno debe estar inactivo antes de eliminarse."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Public Alergenos",
+      "description": "Endpoint publico registrado por AlergenosModule. No usa JWT, pero requiere tenant para aplicar el scope del servicio.",
+      "item": [
+        {
+          "name": "Listar alergenos publicos activos",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/public/alergenos",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "public",
+                "alergenos"
+              ]
+            },
+            "description": "GET /public/alergenos. Devuelve alergenos activos ordenados por nombre."
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
