@@ -1,0 +1,214 @@
+{
+  "info": {
+    "_postman_id": "c02cf2f1-99d6-45b8-8248-46393516d9a0",
+    "name": "Backend Rochester - Clientes",
+    "description": "Coleccion para probar los endpoints del modulo Clientes. Usa {{url}}, {{token}}, {{tenant}} y {{cliente_id}}.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "url",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "tenant",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "tenant_key",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "cliente_id",
+      "value": "00000000-0000-0000-0000-000000000000",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Admin Clientes",
+      "description": "Endpoints protegidos por JWT y roles. Listar y ver detalle aceptan administrador/supervisor; bloquear y desbloquear requieren administrador.",
+      "item": [
+        {
+          "name": "Listar clientes",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/admin/clientes?page=1&limit=20&q=12345678&activo=true&sortBy=apellido&sortOrder=ASC",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "clientes"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Pagina desde 1."
+                },
+                {
+                  "key": "limit",
+                  "value": "20",
+                  "description": "Cantidad por pagina."
+                },
+                {
+                  "key": "q",
+                  "value": "12345678",
+                  "description": "Busqueda por dni, nombre o apellido."
+                },
+                {
+                  "key": "activo",
+                  "value": "true",
+                  "description": "Filtra clientes activos o bloqueados."
+                },
+                {
+                  "key": "sortBy",
+                  "value": "apellido",
+                  "description": "Permitidos: apellido, nombre, fecha_ultima_operacion, created_at."
+                },
+                {
+                  "key": "sortOrder",
+                  "value": "ASC",
+                  "description": "Permitidos: ASC, DESC."
+                }
+              ]
+            },
+            "description": "GET /admin/clientes. Devuelve clientes paginados del tenant actual."
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener cliente por id",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/admin/clientes/{{cliente_id}}",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "clientes",
+                "{{cliente_id}}"
+              ]
+            },
+            "description": "GET /admin/clientes/:id. Requiere que el cliente pertenezca al tenant actual."
+          },
+          "response": []
+        },
+        {
+          "name": "Bloquear cliente",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/admin/clientes/{{cliente_id}}/bloquear",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "clientes",
+                "{{cliente_id}}",
+                "bloquear"
+              ]
+            },
+            "description": "PATCH /admin/clientes/:id/bloquear. Marca activo=false. Devuelve 409 si ya esta bloqueado."
+          },
+          "response": []
+        },
+        {
+          "name": "Desbloquear cliente",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/admin/clientes/{{cliente_id}}/desbloquear",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "clientes",
+                "{{cliente_id}}",
+                "desbloquear"
+              ]
+            },
+            "description": "PATCH /admin/clientes/:id/desbloquear. Marca activo=true. Devuelve 409 si ya esta activo."
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
