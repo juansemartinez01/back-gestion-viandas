@@ -1,0 +1,362 @@
+{
+  "info": {
+    "_postman_id": "fd288f41-af49-4f17-8c49-62416a590de0",
+    "name": "Backend Rochester - Banners Promociones",
+    "description": "Coleccion para probar los endpoints del modulo Banners Promociones. Usa {{url}}, {{token}}, {{tenant}} y {{banner_id}}.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "url",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "tenant",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "tenant_key",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "banner_id",
+      "value": "00000000-0000-0000-0000-000000000000",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Admin Banners",
+      "description": "Endpoints protegidos por JWT y roles. Listar y ver detalle aceptan administrador/supervisor; crear, actualizar, activar, inactivar y eliminar requieren administrador.",
+      "item": [
+        {
+          "name": "Listar banners",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/admin/banners?page=1&limit=20&activo=true&sortBy=orden_visualizacion&sortOrder=ASC",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "banners"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Pagina desde 1."
+                },
+                {
+                  "key": "limit",
+                  "value": "20",
+                  "description": "Cantidad por pagina."
+                },
+                {
+                  "key": "activo",
+                  "value": "true",
+                  "description": "Filtra banners activos o inactivos."
+                },
+                {
+                  "key": "sortBy",
+                  "value": "orden_visualizacion",
+                  "description": "Permitidos: orden_visualizacion, created_at."
+                },
+                {
+                  "key": "sortOrder",
+                  "value": "ASC",
+                  "description": "Permitidos: ASC, DESC."
+                }
+              ]
+            },
+            "description": "GET /admin/banners. Devuelve banners paginados."
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener banner por id",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/admin/banners/{{banner_id}}",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "banners",
+                "{{banner_id}}"
+              ]
+            },
+            "description": "GET /admin/banners/:id. Requiere que el banner pertenezca al tenant actual."
+          },
+          "response": []
+        },
+        {
+          "name": "Crear banner",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titulo\": \"Promo almuerzo saludable\",\n  \"descripcion\": \"Descuento especial en menus seleccionados durante esta semana.\",\n  \"imagen_public_id\": \"banners/promo-almuerzo-saludable\",\n  \"imagen_url\": \"https://cdn.example.com/banners/promo-almuerzo-saludable.webp\",\n  \"url_destino\": \"/menus?categoria=saludable\",\n  \"activo\": true,\n  \"orden_visualizacion\": 1,\n  \"fecha_inicio\": \"2026-06-07\",\n  \"fecha_fin\": \"2026-06-30\"\n}"
+            },
+            "url": {
+              "raw": "{{url}}/admin/banners",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "banners"
+              ]
+            },
+            "description": "POST /admin/banners. fecha_inicio no puede ser posterior a fecha_fin."
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar banner",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titulo\": \"Promo almuerzo saludable extendida\",\n  \"descripcion\": \"Beneficio actualizado para menus saludables.\",\n  \"imagen_public_id\": \"banners/promo-almuerzo-saludable-extendida\",\n  \"imagen_url\": \"https://cdn.example.com/banners/promo-almuerzo-saludable-extendida.webp\",\n  \"url_destino\": \"/menus?etiqueta=recomendado\",\n  \"activo\": true,\n  \"orden_visualizacion\": 2,\n  \"fecha_inicio\": \"2026-06-07\",\n  \"fecha_fin\": \"2026-07-15\"\n}"
+            },
+            "url": {
+              "raw": "{{url}}/admin/banners/{{banner_id}}",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "banners",
+                "{{banner_id}}"
+              ]
+            },
+            "description": "PATCH /admin/banners/:id. Todos los campos son opcionales. Valida rango de fechas combinando valores existentes y enviados."
+          },
+          "response": []
+        },
+        {
+          "name": "Activar banner",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/admin/banners/{{banner_id}}/activar",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "banners",
+                "{{banner_id}}",
+                "activar"
+              ]
+            },
+            "description": "PATCH /admin/banners/:id/activar. Devuelve 409 si ya esta activo."
+          },
+          "response": []
+        },
+        {
+          "name": "Inactivar banner",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/admin/banners/{{banner_id}}/inactivar",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "banners",
+                "{{banner_id}}",
+                "inactivar"
+              ]
+            },
+            "description": "PATCH /admin/banners/:id/inactivar. Devuelve 409 si ya esta inactivo."
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar banner",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/admin/banners/{{banner_id}}",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "banners",
+                "{{banner_id}}"
+              ]
+            },
+            "description": "DELETE /admin/banners/:id. El banner debe estar inactivo antes de eliminarse."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Public Banners",
+      "description": "Endpoint publico registrado por BannersPromocionesModule. No usa JWT, pero requiere tenant. Devuelve solo banners activos y vigentes segun fecha_inicio/fecha_fin.",
+      "item": [
+        {
+          "name": "Listar banners publicos vigentes",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/public/banners",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "public",
+                "banners"
+              ]
+            },
+            "description": "GET /public/banners. Devuelve banners activos, con fecha_inicio nula o vigente y fecha_fin nula o vigente."
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
