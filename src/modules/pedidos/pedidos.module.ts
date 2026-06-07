@@ -5,6 +5,7 @@ import { MenusPublicadosModule } from 'src/modules/menus-publicados/menus-public
 import { SedesModule } from 'src/modules/sedes/sedes.module';
 import { PuntosRetiroModule } from 'src/modules/puntos-retiro/puntos-retiro.module';
 import { AuditModule } from 'src/modules/audit/audit.module';
+import { PagosModule } from 'src/modules/pagos/pagos.module';
 import { Pedido } from './entities/pedido.entity';
 import { PedidosService } from './pedidos.service';
 import { PedidosController } from './pedidos.controller';
@@ -19,6 +20,7 @@ import { PedidosExpiracionJob } from './pedidos-expiracion.job';
     SedesModule,
     PuntosRetiroModule,
     AuditModule,
+    PagosModule,
   ],
   providers: [PedidosService, PedidosExpiracionJob],
   controllers: [PedidosController, PublicPedidosController],

@@ -1,0 +1,443 @@
+{
+  "info": {
+    "_postman_id": "dd0d1ac0-6097-497d-9ed9-dc88440ffd3a",
+    "name": "Backend Rochester - Pedidos",
+    "description": "Coleccion para probar los endpoints del modulo Pedidos. Usa {{url}}, {{token}}, {{tenant}}, {{pedido_id}}, {{menu_publicado_id}}, {{sede_id}} y {{punto_retiro_id}}. El job pedidos-expiracion corre interno cada 5 minutos y no expone endpoint HTTP.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "url",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "tenant",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "tenant_key",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "pedido_id",
+      "value": "00000000-0000-0000-0000-000000000000",
+      "type": "string"
+    },
+    {
+      "key": "menu_publicado_id",
+      "value": "00000000-0000-0000-0000-000000000000",
+      "type": "string"
+    },
+    {
+      "key": "sede_id",
+      "value": "00000000-0000-0000-0000-000000000000",
+      "type": "string"
+    },
+    {
+      "key": "punto_retiro_id",
+      "value": "00000000-0000-0000-0000-000000000000",
+      "type": "string"
+    },
+    {
+      "key": "dni",
+      "value": "12345678",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Admin Pedidos",
+      "description": "Endpoints protegidos por JWT y roles. Listar/detalle/cancelar aceptan administrador, supervisor y operador_caja. Crear manual acepta administrador/supervisor. Update requiere administrador.",
+      "item": [
+        {
+          "name": "Listar pedidos",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/admin/pedidos?page=1&limit=20&fecha_retiro=2026-06-15&sede_id={{sede_id}}&punto_retiro_id={{punto_retiro_id}}&estado_pedido=confirmado_pago_presencial&estado_pago=presencial_pendiente&menu_publicado_id={{menu_publicado_id}}&dni={{dni}}",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "pedidos"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Pagina desde 1."
+                },
+                {
+                  "key": "limit",
+                  "value": "20",
+                  "description": "Cantidad por pagina."
+                },
+                {
+                  "key": "fecha_retiro",
+                  "value": "2026-06-15",
+                  "description": "Fecha de retiro en formato YYYY-MM-DD."
+                },
+                {
+                  "key": "sede_id",
+                  "value": "{{sede_id}}",
+                  "description": "Filtra por sede."
+                },
+                {
+                  "key": "punto_retiro_id",
+                  "value": "{{punto_retiro_id}}",
+                  "description": "Filtra por punto de retiro."
+                },
+                {
+                  "key": "estado_pedido",
+                  "value": "confirmado_pago_presencial",
+                  "description": "pendiente_pago_online | confirmado_pago_online | confirmado_pago_presencial | entregado | no_retirado | cancelado"
+                },
+                {
+                  "key": "estado_pago",
+                  "value": "presencial_pendiente",
+                  "description": "pendiente | aprobado | rechazado | cancelado | presencial_pendiente | presencial_cobrado"
+                },
+                {
+                  "key": "menu_publicado_id",
+                  "value": "{{menu_publicado_id}}",
+                  "description": "Filtra por menu publicado."
+                },
+                {
+                  "key": "dni",
+                  "value": "{{dni}}",
+                  "description": "Busqueda parcial por DNI informado."
+                }
+              ]
+            },
+            "description": "GET /admin/pedidos. Devuelve pedidos paginados del tenant actual."
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener pedido por id",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/admin/pedidos/{{pedido_id}}",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "pedidos",
+                "{{pedido_id}}"
+              ]
+            },
+            "description": "GET /admin/pedidos/:id. Incluye menuPublicado, sede y puntoRetiro."
+          },
+          "response": []
+        },
+        {
+          "name": "Crear pedido manual",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"menu_publicado_id\": \"{{menu_publicado_id}}\",\n  \"punto_retiro_id\": \"{{punto_retiro_id}}\",\n  \"dni\": \"12345678\",\n  \"nombre\": \"Juan\",\n  \"apellido\": \"Perez\",\n  \"telefono\": \"+54 341 555-1234\",\n  \"email\": \"juan.perez@example.com\",\n  \"cantidad\": 2,\n  \"medio_pago\": \"presencial\"\n}"
+            },
+            "url": {
+              "raw": "{{url}}/admin/pedidos/manual",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "pedidos",
+                "manual"
+              ]
+            },
+            "description": "POST /admin/pedidos/manual. Solo admite medio_pago presencial."
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar pedido",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"telefono_informado\": \"+54 341 555-5678\",\n  \"email_informado\": \"juan.actualizado@example.com\",\n  \"motivo\": \"Actualizacion de datos de contacto solicitada por el cliente.\"\n}"
+            },
+            "url": {
+              "raw": "{{url}}/admin/pedidos/{{pedido_id}}",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "pedidos",
+                "{{pedido_id}}"
+              ]
+            },
+            "description": "PATCH /admin/pedidos/:id. Requiere rol administrador. Actualiza datos informados de contacto y motivo_cancelacion."
+          },
+          "response": []
+        },
+        {
+          "name": "Cancelar pedido desde admin",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"motivo\": \"Cancelado por solicitud telefonica del cliente.\"\n}"
+            },
+            "url": {
+              "raw": "{{url}}/admin/pedidos/{{pedido_id}}/cancelar",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "pedidos",
+                "{{pedido_id}}",
+                "cancelar"
+              ]
+            },
+            "description": "POST /admin/pedidos/:id/cancelar. Marca cancelado_por=administracion. Si el pago estaba aprobado, marca devolucion_pendiente=true."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Public Pedidos",
+      "description": "Endpoints publicos para crear pedidos, consultar por DNI y cancelar desde portal. No usan JWT, pero requieren tenant.",
+      "item": [
+        {
+          "name": "Crear pedido publico",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"menu_publicado_id\": \"{{menu_publicado_id}}\",\n  \"punto_retiro_id\": \"{{punto_retiro_id}}\",\n  \"dni\": \"12345678\",\n  \"nombre\": \"Juan\",\n  \"apellido\": \"Perez\",\n  \"telefono\": \"+54 341 555-1234\",\n  \"email\": \"juan.perez@example.com\",\n  \"cantidad\": 2,\n  \"medio_pago\": \"mercado_pago\"\n}"
+            },
+            "url": {
+              "raw": "{{url}}/public/pedidos",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "public",
+                "pedidos"
+              ]
+            },
+            "description": "POST /public/pedidos. medio_pago puede ser mercado_pago o presencial. Si es mercado_pago queda pendiente_pago_online y expira en 15 minutos."
+          },
+          "response": []
+        },
+        {
+          "name": "Consultar pedidos por DNI",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/public/pedidos/consultar?dni={{dni}}",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "public",
+                "pedidos",
+                "consultar"
+              ],
+              "query": [
+                {
+                  "key": "dni",
+                  "value": "{{dni}}",
+                  "description": "DNI exacto usado para la consulta."
+                }
+              ]
+            },
+            "description": "GET /public/pedidos/consultar?dni=. Devuelve hasta 50 pedidos recientes por DNI."
+          },
+          "response": []
+        },
+        {
+          "name": "Cancelar pedido desde portal",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"motivo\": \"El cliente no podra retirar el pedido.\"\n}"
+            },
+            "url": {
+              "raw": "{{url}}/public/pedidos/{{pedido_id}}/cancelar",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "public",
+                "pedidos",
+                "{{pedido_id}}",
+                "cancelar"
+              ]
+            },
+            "description": "POST /public/pedidos/:id/cancelar. Respeta ventana de cancelacion del menu publicado. Si pago estaba aprobado, marca devolucion_pendiente=true."
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

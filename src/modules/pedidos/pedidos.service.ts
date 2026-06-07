@@ -19,6 +19,7 @@ import { CreatePedidoManualDto } from './dto/create-pedido-manual.dto';
 import { UpdatePedidoDto } from './dto/update-pedido.dto';
 import { QueryPedidoDto } from './dto/query-pedido.dto';
 import { CancelarPedidoDto } from './dto/cancelar-pedido.dto';
+import { PagosService } from 'src/modules/pagos/pagos.service';
 
 @Injectable()
 export class PedidosService extends BaseCrudTenantService<Pedido> {
@@ -28,6 +29,7 @@ export class PedidosService extends BaseCrudTenantService<Pedido> {
     private readonly dataSource: DataSource,
     private readonly menusPublicadosService: MenusPublicadosService,
     private readonly clientesService: ClientesService,
+    private readonly pagosService: PagosService,
   ) {
     super(pedidoRepo);
   }
@@ -189,6 +191,13 @@ export class PedidosService extends BaseCrudTenantService<Pedido> {
       });
 
       const saved = await qr.manager.save(Pedido, pedido);
+
+      if (dto.medio_pago === MedioPagoPedido.PRESENCIAL) {
+        await this.pagosService.crearPagoPresencial(saved.id, saved.importe_total, tenantId, qr);
+      } else {
+        await this.pagosService.crearPagoOnline(saved.id, saved.importe_total, tenantId, qr);
+      }
+
       await qr.commitTransaction();
       return saved;
     } catch (err) {
@@ -305,6 +314,7 @@ export class PedidosService extends BaseCrudTenantService<Pedido> {
     id: string,
     dto?: CancelarPedidoDto,
   ): Promise<Pedido> {
+    const tenantId = this.getTenantId({ strictTenant: true }) as string;
     const pedido = await this.findOne(id);
 
     const estadosTerminales = [EstadoPedido.ENTREGADO, EstadoPedido.CANCELADO];
@@ -355,7 +365,9 @@ export class PedidosService extends BaseCrudTenantService<Pedido> {
     pedido.estado_pago = EstadoPagoPedido.CANCELADO;
     pedido.motivo_cancelacion = dto?.motivo ?? null;
 
-    return this.pedidoRepo.save(pedido);
+    const saved = await this.pedidoRepo.save(pedido);
+    await this.pagosService.cancelarPago(saved.id, tenantId);
+    return saved;
   }
 
   async cancelarDesdeAdmin(
@@ -363,6 +375,7 @@ export class PedidosService extends BaseCrudTenantService<Pedido> {
     dto: CancelarPedidoDto,
     usuarioId: string,
   ): Promise<Pedido> {
+    const tenantId = this.getTenantId({ strictTenant: true }) as string;
     const pedido = await this.findOne(id);
 
     const estadosTerminales = [EstadoPedido.ENTREGADO, EstadoPedido.CANCELADO];
@@ -388,7 +401,9 @@ export class PedidosService extends BaseCrudTenantService<Pedido> {
       pedido.devolucion_pendiente = true;
     }
 
-    return this.pedidoRepo.save(pedido);
+    const saved = await this.pedidoRepo.save(pedido);
+    await this.pagosService.cancelarPago(saved.id, tenantId);
+    return saved;
   }
 
   async updatePedido(id: string, dto: UpdatePedidoDto): Promise<Pedido> {
