@@ -1,0 +1,503 @@
+{
+  "info": {
+    "_postman_id": "96a92651-99c7-41d8-82b3-e98bb1f0af79",
+    "name": "Backend Rochester - Menus Publicados",
+    "description": "Coleccion para probar los endpoints del modulo Menus Publicados. Usa {{url}}, {{token}}, {{tenant}}, {{menu_publicado_id}}, {{menu_base_id}}, {{sede_id}} y {{punto_retiro_id}}.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "url",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "tenant",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "tenant_key",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "menu_publicado_id",
+      "value": "00000000-0000-0000-0000-000000000000",
+      "type": "string"
+    },
+    {
+      "key": "menu_base_id",
+      "value": "00000000-0000-0000-0000-000000000000",
+      "type": "string"
+    },
+    {
+      "key": "sede_id",
+      "value": "00000000-0000-0000-0000-000000000000",
+      "type": "string"
+    },
+    {
+      "key": "punto_retiro_id",
+      "value": "00000000-0000-0000-0000-000000000000",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Admin Menus Publicados",
+      "description": "Endpoints protegidos por JWT y roles. Listar y ver detalle aceptan administrador/supervisor; crear tambien acepta administrador/supervisor; editar y eliminar requieren administrador; transiciones aceptan administrador/supervisor salvo reglas internas.",
+      "item": [
+        {
+          "name": "Listar menus publicados",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/admin/menus-publicados?page=1&limit=20&fecha_venta=2026-06-15&sede_id={{sede_id}}&estado=activo&menu_base_id={{menu_base_id}}&sortBy=created_at&sortOrder=DESC",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "menus-publicados"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Pagina desde 1."
+                },
+                {
+                  "key": "limit",
+                  "value": "20",
+                  "description": "Cantidad por pagina."
+                },
+                {
+                  "key": "fecha_venta",
+                  "value": "2026-06-15",
+                  "description": "Fecha de venta en formato YYYY-MM-DD."
+                },
+                {
+                  "key": "sede_id",
+                  "value": "{{sede_id}}",
+                  "description": "Filtra por sede."
+                },
+                {
+                  "key": "estado",
+                  "value": "activo",
+                  "description": "activo | pausado | cerrado | agotado | cancelado"
+                },
+                {
+                  "key": "menu_base_id",
+                  "value": "{{menu_base_id}}",
+                  "description": "Filtra por menu base."
+                },
+                {
+                  "key": "sortBy",
+                  "value": "created_at",
+                  "description": "Permitidos: created_at, fecha_venta, precio_encargo."
+                },
+                {
+                  "key": "sortOrder",
+                  "value": "DESC",
+                  "description": "Permitidos: ASC, DESC."
+                }
+              ]
+            },
+            "description": "GET /admin/menus-publicados. Devuelve menus publicados paginados con menuBase y puntosRetiro."
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener menu publicado por id",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/admin/menus-publicados/{{menu_publicado_id}}",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "menus-publicados",
+                "{{menu_publicado_id}}"
+              ]
+            },
+            "description": "GET /admin/menus-publicados/:id. Devuelve menuBase con categorias, etiquetas y alergenos, sede y puntos de retiro."
+          },
+          "response": []
+        },
+        {
+          "name": "Publicar menu",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"menu_base_id\": \"{{menu_base_id}}\",\n  \"sede_id\": \"{{sede_id}}\",\n  \"puntos_retiro_ids\": [\n    \"{{punto_retiro_id}}\"\n  ],\n  \"fecha_venta\": \"2026-06-15\",\n  \"precio_encargo\": 4500,\n  \"precio_sobrante\": 3800,\n  \"fecha_hora_limite_encargo\": \"2026-06-15T13:00:00.000Z\",\n  \"fecha_hora_limite_cancelacion\": \"2026-06-15T10:00:00.000Z\",\n  \"limite_maximo_viandas\": 80,\n  \"tipo_sobreproduccion\": \"cantidad_fija\",\n  \"valor_sobreproduccion\": 10,\n  \"imagen_public_id\": \"menus/publicados/ensalada-2026-06-15\",\n  \"imagen_url\": \"https://cdn.example.com/menus/publicados/ensalada-2026-06-15.webp\",\n  \"observaciones\": \"Disponible para retiro en horario de almuerzo.\"\n}"
+            },
+            "url": {
+              "raw": "{{url}}/admin/menus-publicados",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "menus-publicados"
+              ]
+            },
+            "description": "POST /admin/menus-publicados. El menu base y la sede deben estar activos. Los puntos de retiro deben estar activos y pertenecer a la sede."
+          },
+          "response": []
+        },
+        {
+          "name": "Editar menu publicado",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"puntos_retiro_ids\": [\n    \"{{punto_retiro_id}}\"\n  ],\n  \"precio_encargo\": 4800,\n  \"precio_sobrante\": 4000,\n  \"fecha_hora_limite_encargo\": \"2026-06-15T13:30:00.000Z\",\n  \"fecha_hora_limite_cancelacion\": \"2026-06-15T10:30:00.000Z\",\n  \"limite_maximo_viandas\": 90,\n  \"tipo_sobreproduccion\": \"porcentaje\",\n  \"valor_sobreproduccion\": 15,\n  \"imagen_public_id\": \"menus/publicados/ensalada-premium-2026-06-15\",\n  \"imagen_url\": \"https://cdn.example.com/menus/publicados/ensalada-premium-2026-06-15.webp\",\n  \"observaciones\": \"Actualizado por demanda esperada.\"\n}"
+            },
+            "url": {
+              "raw": "{{url}}/admin/menus-publicados/{{menu_publicado_id}}",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "menus-publicados",
+                "{{menu_publicado_id}}"
+              ]
+            },
+            "description": "PATCH /admin/menus-publicados/:id. Todos los campos son opcionales. No cambia menu_base_id, sede_id ni fecha_venta."
+          },
+          "response": []
+        },
+        {
+          "name": "Pausar menu publicado",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/admin/menus-publicados/{{menu_publicado_id}}/pausar",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "menus-publicados",
+                "{{menu_publicado_id}}",
+                "pausar"
+              ]
+            },
+            "description": "PATCH /admin/menus-publicados/:id/pausar. Solo desde estado activo."
+          },
+          "response": []
+        },
+        {
+          "name": "Reactivar menu publicado",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/admin/menus-publicados/{{menu_publicado_id}}/reactivar",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "menus-publicados",
+                "{{menu_publicado_id}}",
+                "reactivar"
+              ]
+            },
+            "description": "PATCH /admin/menus-publicados/:id/reactivar. Solo desde estado pausado."
+          },
+          "response": []
+        },
+        {
+          "name": "Cerrar menu publicado",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/admin/menus-publicados/{{menu_publicado_id}}/cerrar",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "menus-publicados",
+                "{{menu_publicado_id}}",
+                "cerrar"
+              ]
+            },
+            "description": "PATCH /admin/menus-publicados/:id/cerrar. Permitido desde activo o pausado."
+          },
+          "response": []
+        },
+        {
+          "name": "Agotar menu publicado",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/admin/menus-publicados/{{menu_publicado_id}}/agotar",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "menus-publicados",
+                "{{menu_publicado_id}}",
+                "agotar"
+              ]
+            },
+            "description": "PATCH /admin/menus-publicados/:id/agotar. Solo desde estado activo."
+          },
+          "response": []
+        },
+        {
+          "name": "Cancelar menu publicado",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/admin/menus-publicados/{{menu_publicado_id}}/cancelar",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "menus-publicados",
+                "{{menu_publicado_id}}",
+                "cancelar"
+              ]
+            },
+            "description": "PATCH /admin/menus-publicados/:id/cancelar. Supervisor no puede cancelar menus cerrados o agotados; administrador si."
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar menu publicado",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/admin/menus-publicados/{{menu_publicado_id}}",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "menus-publicados",
+                "{{menu_publicado_id}}"
+              ]
+            },
+            "description": "DELETE /admin/menus-publicados/:id. Solo se pueden eliminar menus publicados en estado cancelado."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Public Menus Disponibles",
+      "description": "Endpoint publico para listar menus disponibles. No usa JWT, pero requiere tenant y sede_id.",
+      "item": [
+        {
+          "name": "Listar menus disponibles",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/public/menus-disponibles?sede_id={{sede_id}}&punto_retiro_id={{punto_retiro_id}}",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "public",
+                "menus-disponibles"
+              ],
+              "query": [
+                {
+                  "key": "sede_id",
+                  "value": "{{sede_id}}",
+                  "description": "UUID de sede. Obligatorio."
+                },
+                {
+                  "key": "punto_retiro_id",
+                  "value": "{{punto_retiro_id}}",
+                  "description": "UUID de punto de retiro. Opcional."
+                }
+              ]
+            },
+            "description": "GET /public/menus-disponibles. Devuelve menus publicados activos para la sede, desde hoy hasta 7 dias hacia adelante."
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
