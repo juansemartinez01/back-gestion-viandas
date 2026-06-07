@@ -1,0 +1,432 @@
+{
+  "info": {
+    "_postman_id": "86e2fd89-c0d5-47dc-89ad-2fa20eac049dd",
+    "name": "Backend Rochester - Menus Base",
+    "description": "Coleccion para probar los endpoints del modulo Menus Base. Usa {{url}}, {{token}}, {{tenant}}, {{menu_base_id}}, {{categoria_menu_id}}, {{etiqueta_menu_id}} y {{alergeno_id}}.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "url",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "tenant",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "tenant_key",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "menu_base_id",
+      "value": "00000000-0000-0000-0000-000000000000",
+      "type": "string"
+    },
+    {
+      "key": "categoria_menu_id",
+      "value": "00000000-0000-0000-0000-000000000000",
+      "type": "string"
+    },
+    {
+      "key": "etiqueta_menu_id",
+      "value": "00000000-0000-0000-0000-000000000000",
+      "type": "string"
+    },
+    {
+      "key": "alergeno_id",
+      "value": "00000000-0000-0000-0000-000000000000",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Admin Menus Base",
+      "description": "Endpoints protegidos por JWT y roles. Listar y ver detalle aceptan administrador/supervisor; crear, actualizar, activar, inactivar y eliminar requieren administrador.",
+      "item": [
+        {
+          "name": "Listar menus base",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/admin/menus-base?page=1&limit=20&q=ensalada&activo=true&categoria_id={{categoria_menu_id}}&etiqueta_id={{etiqueta_menu_id}}&alergeno_id={{alergeno_id}}&sortBy=created_at&sortOrder=DESC",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "menus-base"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Pagina desde 1."
+                },
+                {
+                  "key": "limit",
+                  "value": "20",
+                  "description": "Cantidad por pagina."
+                },
+                {
+                  "key": "q",
+                  "value": "ensalada",
+                  "description": "Busqueda por nombre."
+                },
+                {
+                  "key": "activo",
+                  "value": "true",
+                  "description": "Filtra menus activos o inactivos."
+                },
+                {
+                  "key": "categoria_id",
+                  "value": "{{categoria_menu_id}}",
+                  "description": "Filtra por categoria relacionada."
+                },
+                {
+                  "key": "etiqueta_id",
+                  "value": "{{etiqueta_menu_id}}",
+                  "description": "Filtra por etiqueta relacionada."
+                },
+                {
+                  "key": "alergeno_id",
+                  "value": "{{alergeno_id}}",
+                  "description": "Filtra por alergeno relacionado."
+                },
+                {
+                  "key": "sortBy",
+                  "value": "created_at",
+                  "description": "Permitidos: nombre, created_at."
+                },
+                {
+                  "key": "sortOrder",
+                  "value": "DESC",
+                  "description": "Permitidos: ASC, DESC."
+                }
+              ]
+            },
+            "description": "GET /admin/menus-base. Devuelve menus base paginados con categorias, etiquetas y alergenos relacionados."
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener menu base por id",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/admin/menus-base/{{menu_base_id}}",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "menus-base",
+                "{{menu_base_id}}"
+              ]
+            },
+            "description": "GET /admin/menus-base/:id. Requiere que el menu base pertenezca al tenant actual."
+          },
+          "response": []
+        },
+        {
+          "name": "Crear menu base",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Ensalada Mediterranea\",\n  \"descripcion\": \"Menu base fresco con vegetales, queso y aceitunas.\",\n  \"imagen_public_id\": \"menus/base/ensalada-mediterranea\",\n  \"imagen_url\": \"https://cdn.example.com/menus/ensalada-mediterranea.webp\",\n  \"ingredientes_principales\": \"Lechuga, tomate, pepino, aceitunas, queso y vinagreta.\",\n  \"calorias_aprox\": 420,\n  \"proteinas_aprox\": 18,\n  \"carbohidratos_aprox\": 34,\n  \"grasas_aprox\": 22,\n  \"categoria_ids\": [\n    \"{{categoria_menu_id}}\"\n  ],\n  \"etiqueta_ids\": [\n    \"{{etiqueta_menu_id}}\"\n  ],\n  \"alergeno_ids\": [\n    \"{{alergeno_id}}\"\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{url}}/admin/menus-base",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "menus-base"
+              ]
+            },
+            "description": "POST /admin/menus-base. Las categorias, etiquetas y alergenos enviados deben existir, pertenecer al tenant y estar activos."
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar menu base",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Ensalada Mediterranea Premium\",\n  \"descripcion\": \"Version actualizada con mayor aporte proteico.\",\n  \"imagen_public_id\": \"menus/base/ensalada-mediterranea-premium\",\n  \"imagen_url\": \"https://cdn.example.com/menus/ensalada-mediterranea-premium.webp\",\n  \"ingredientes_principales\": \"Lechuga, tomate, pepino, aceitunas, queso, pollo grillado y vinagreta.\",\n  \"calorias_aprox\": 520,\n  \"proteinas_aprox\": 32,\n  \"carbohidratos_aprox\": 36,\n  \"grasas_aprox\": 24,\n  \"categoria_ids\": [\n    \"{{categoria_menu_id}}\"\n  ],\n  \"etiqueta_ids\": [\n    \"{{etiqueta_menu_id}}\"\n  ],\n  \"alergeno_ids\": [\n    \"{{alergeno_id}}\"\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{url}}/admin/menus-base/{{menu_base_id}}",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "menus-base",
+                "{{menu_base_id}}"
+              ]
+            },
+            "description": "PATCH /admin/menus-base/:id. Todos los campos son opcionales. Enviar arrays vacios para limpiar categorias, etiquetas o alergenos."
+          },
+          "response": []
+        },
+        {
+          "name": "Activar menu base",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/admin/menus-base/{{menu_base_id}}/activar",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "menus-base",
+                "{{menu_base_id}}",
+                "activar"
+              ]
+            },
+            "description": "PATCH /admin/menus-base/:id/activar. Devuelve 409 si ya esta activo."
+          },
+          "response": []
+        },
+        {
+          "name": "Inactivar menu base",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/admin/menus-base/{{menu_base_id}}/inactivar",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "menus-base",
+                "{{menu_base_id}}",
+                "inactivar"
+              ]
+            },
+            "description": "PATCH /admin/menus-base/:id/inactivar. Devuelve 409 si ya esta inactivo."
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar menu base",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/admin/menus-base/{{menu_base_id}}",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "menus-base",
+                "{{menu_base_id}}"
+              ]
+            },
+            "description": "DELETE /admin/menus-base/:id. El menu base debe estar inactivo antes de eliminarse."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Public Menus Base",
+      "description": "Endpoints publicos registrados por MenusBaseModule. No usan JWT, pero requieren tenant para aplicar scope.",
+      "item": [
+        {
+          "name": "Listar menus base publicos activos",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/public/menus-base",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "public",
+                "menus-base"
+              ]
+            },
+            "description": "GET /public/menus-base. Devuelve menus activos ordenados por nombre."
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener menu base publico por id",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/public/menus-base/{{menu_base_id}}",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "public",
+                "menus-base",
+                "{{menu_base_id}}"
+              ]
+            },
+            "description": "GET /public/menus-base/:id. Solo devuelve menus activos."
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

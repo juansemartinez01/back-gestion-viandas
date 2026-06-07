@@ -1,5 +1,5 @@
 <!-- SPECKIT START -->
 For additional context about technologies to be used, project structure,
 shell commands, and other important information, read the current plan
-at specs/008-menus-base-crud/plan.md
+at specs/009-menus-publicados/plan.md
 <!-- SPECKIT END -->

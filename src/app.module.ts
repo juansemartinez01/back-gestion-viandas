@@ -23,6 +23,7 @@ import { EtiquetasMenuModule } from './modules/etiquetas-menu/etiquetas-menu.mod
 import { AlergenosModule } from './modules/alergenos/alergenos.module';
 import { ClientesModule } from './modules/clientes/clientes.module';
 import { MenusBaseModule } from './modules/menus-base/menus-base.module';
+import { MenusPublicadosModule } from './modules/menus-publicados/menus-publicados.module';
 
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { ObservabilityModule } from './infra/observability/observability.module';
@@ -63,6 +64,7 @@ import { ObservabilityModule } from './infra/observability/observability.module'
     AlergenosModule,
     ClientesModule,
     MenusBaseModule,
+    MenusPublicadosModule,
   ],
   controllers: [AppController],
   providers: [
