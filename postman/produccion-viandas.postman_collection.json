@@ -1,0 +1,343 @@
+{
+  "info": {
+    "_postman_id": "e26a25f2-38d3-4b68-b7b8-f257e3378503",
+    "name": "Backend Rochester - Produccion Viandas",
+    "description": "Coleccion para probar los endpoints del modulo Produccion Viandas. Usa {{url}}, {{token}}, {{tenant}}, {{orden_produccion_id}}, {{fecha_produccion}}, {{sede_id}}, {{punto_retiro_id}} y {{menu_publicado_id}}.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "url",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "tenant",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "tenant_key",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "orden_produccion_id",
+      "value": "00000000-0000-0000-0000-000000000000",
+      "type": "string"
+    },
+    {
+      "key": "fecha_produccion",
+      "value": "2026-06-15",
+      "type": "string"
+    },
+    {
+      "key": "sede_id",
+      "value": "00000000-0000-0000-0000-000000000000",
+      "type": "string"
+    },
+    {
+      "key": "punto_retiro_id",
+      "value": "00000000-0000-0000-0000-000000000000",
+      "type": "string"
+    },
+    {
+      "key": "menu_publicado_id",
+      "value": "00000000-0000-0000-0000-000000000000",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Admin Produccion Viandas",
+      "description": "Endpoints protegidos por JWT. Listar, imprimible y detalle aceptan administrador/supervisor/cocina. Generar, pasar a en_produccion y confirmar aceptan administrador/supervisor.",
+      "item": [
+        {
+          "name": "Listar ordenes de produccion",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/admin/produccion-viandas?page=1&limit=20&fecha_produccion={{fecha_produccion}}&sede_id={{sede_id}}&punto_retiro_id={{punto_retiro_id}}&menu_publicado_id={{menu_publicado_id}}&estado=pendiente",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "produccion-viandas"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Pagina desde 1."
+                },
+                {
+                  "key": "limit",
+                  "value": "20",
+                  "description": "Cantidad por pagina."
+                },
+                {
+                  "key": "fecha_produccion",
+                  "value": "{{fecha_produccion}}",
+                  "description": "Fecha de produccion en formato YYYY-MM-DD."
+                },
+                {
+                  "key": "sede_id",
+                  "value": "{{sede_id}}",
+                  "description": "Filtra por sede."
+                },
+                {
+                  "key": "punto_retiro_id",
+                  "value": "{{punto_retiro_id}}",
+                  "description": "Filtra por punto de retiro."
+                },
+                {
+                  "key": "menu_publicado_id",
+                  "value": "{{menu_publicado_id}}",
+                  "description": "Filtra por menu publicado."
+                },
+                {
+                  "key": "estado",
+                  "value": "pendiente",
+                  "description": "pendiente | en_produccion | confirmada_completa | confirmada_con_diferencia | cancelada"
+                }
+              ]
+            },
+            "description": "GET /admin/produccion-viandas. Devuelve ordenes paginadas con sede, puntoRetiro, menuPublicado y menuBase."
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener imprimible de produccion",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/admin/produccion-viandas/imprimible?fecha_produccion={{fecha_produccion}}&sede_id={{sede_id}}&punto_retiro_id={{punto_retiro_id}}&menu_publicado_id={{menu_publicado_id}}&estado=pendiente",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "produccion-viandas",
+                "imprimible"
+              ],
+              "query": [
+                {
+                  "key": "fecha_produccion",
+                  "value": "{{fecha_produccion}}"
+                },
+                {
+                  "key": "sede_id",
+                  "value": "{{sede_id}}"
+                },
+                {
+                  "key": "punto_retiro_id",
+                  "value": "{{punto_retiro_id}}"
+                },
+                {
+                  "key": "menu_publicado_id",
+                  "value": "{{menu_publicado_id}}"
+                },
+                {
+                  "key": "estado",
+                  "value": "pendiente"
+                }
+              ]
+            },
+            "description": "GET /admin/produccion-viandas/imprimible. Devuelve filas simples para imprimir: fecha, sede, punto_retiro, menu, total_sugerido y estado."
+          },
+          "response": []
+        },
+        {
+          "name": "Generar produccion",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fecha_produccion\": \"{{fecha_produccion}}\",\n  \"sede_id\": \"{{sede_id}}\"\n}"
+            },
+            "url": {
+              "raw": "{{url}}/admin/produccion-viandas/generar",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "produccion-viandas",
+                "generar"
+              ]
+            },
+            "description": "POST /admin/produccion-viandas/generar. Genera o actualiza ordenes pendientes/en_produccion para menus publicados activos de la sede y fecha."
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener orden por id",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/admin/produccion-viandas/{{orden_produccion_id}}",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "produccion-viandas",
+                "{{orden_produccion_id}}"
+              ]
+            },
+            "description": "GET /admin/produccion-viandas/:id. Devuelve la orden con sede, puntoRetiro, menuPublicado y menuBase."
+          },
+          "response": []
+        },
+        {
+          "name": "Marcar en produccion",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/admin/produccion-viandas/{{orden_produccion_id}}/en-produccion",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "produccion-viandas",
+                "{{orden_produccion_id}}",
+                "en-produccion"
+              ]
+            },
+            "description": "PATCH /admin/produccion-viandas/:id/en-produccion. Solo ordenes pendientes pueden pasar a en_produccion."
+          },
+          "response": []
+        },
+        {
+          "name": "Confirmar produccion",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cantidad_real_producida\": 42,\n  \"observacion\": \"Se produjeron 2 unidades extra por margen operativo.\"\n}"
+            },
+            "url": {
+              "raw": "{{url}}/admin/produccion-viandas/{{orden_produccion_id}}/confirmar",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "produccion-viandas",
+                "{{orden_produccion_id}}",
+                "confirmar"
+              ]
+            },
+            "description": "POST /admin/produccion-viandas/:id/confirmar. Si cantidad_real_producida difiere del total_sugerido, observacion es obligatoria."
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

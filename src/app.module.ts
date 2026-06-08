@@ -29,6 +29,8 @@ import { PedidosModule } from './modules/pedidos/pedidos.module';
 import { PagosModule } from './modules/pagos/pagos.module';
 import { MercadoPagoModule } from './modules/mercado-pago/mercado-pago.module';
 import { CancelacionesPedidosModule } from './modules/cancelaciones-pedidos/cancelaciones-pedidos.module';
+import { ProduccionViandasModule } from './modules/produccion-viandas/produccion-viandas.module';
+import { StockViandasModule } from './modules/stock-viandas/stock-viandas.module';
 
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { ObservabilityModule } from './infra/observability/observability.module';
@@ -75,6 +77,8 @@ import { ObservabilityModule } from './infra/observability/observability.module'
     PagosModule,
     MercadoPagoModule,
     CancelacionesPedidosModule,
+    ProduccionViandasModule,
+    StockViandasModule,
   ],
   controllers: [AppController],
   providers: [

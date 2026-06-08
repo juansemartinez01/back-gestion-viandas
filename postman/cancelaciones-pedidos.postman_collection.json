@@ -1,0 +1,213 @@
+{
+  "info": {
+    "_postman_id": "c851a257-2bb4-47e1-893a-fdcecf5c49c1",
+    "name": "Backend Rochester - Cancelaciones Pedidos",
+    "description": "Coleccion para probar los endpoints del modulo Cancelaciones Pedidos. Usa {{url}}, {{token}}, {{tenant}}, {{sede_id}}, {{fecha_desde}}, {{fecha_hasta}} y {{fecha}}. Este modulo expone consultas administrativas sobre pedidos cancelados; la accion de cancelar pedidos vive en el modulo Pedidos.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "url",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "tenant",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "tenant_key",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "sede_id",
+      "value": "00000000-0000-0000-0000-000000000000",
+      "type": "string"
+    },
+    {
+      "key": "fecha_desde",
+      "value": "2026-06-01T00:00:00.000Z",
+      "type": "string"
+    },
+    {
+      "key": "fecha_hasta",
+      "value": "2026-06-30T23:59:59.999Z",
+      "type": "string"
+    },
+    {
+      "key": "fecha",
+      "value": "2026-06-08",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Admin Cancelaciones",
+      "description": "Endpoints protegidos por JWT. Listado y resumen aceptan administrador/supervisor. Devolucion pendiente requiere administrador.",
+      "item": [
+        {
+          "name": "Listar cancelaciones",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/admin/cancelaciones?page=1&limit=20&fecha_desde={{fecha_desde}}&fecha_hasta={{fecha_hasta}}&sede_id={{sede_id}}&cancelado_por=cliente&devolucion_pendiente=true",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "cancelaciones"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Pagina desde 1."
+                },
+                {
+                  "key": "limit",
+                  "value": "20",
+                  "description": "Cantidad por pagina."
+                },
+                {
+                  "key": "fecha_desde",
+                  "value": "{{fecha_desde}}",
+                  "description": "Fecha/hora inicial ISO para fecha_cancelacion."
+                },
+                {
+                  "key": "fecha_hasta",
+                  "value": "{{fecha_hasta}}",
+                  "description": "Fecha/hora final ISO para fecha_cancelacion."
+                },
+                {
+                  "key": "sede_id",
+                  "value": "{{sede_id}}",
+                  "description": "Filtra por sede."
+                },
+                {
+                  "key": "cancelado_por",
+                  "value": "cliente",
+                  "description": "cliente | administracion"
+                },
+                {
+                  "key": "devolucion_pendiente",
+                  "value": "true",
+                  "description": "true | false"
+                }
+              ]
+            },
+            "description": "GET /admin/cancelaciones. Devuelve pedidos con estado_pedido=cancelado, paginados y con sede, puntoRetiro, menuPublicado y cliente."
+          },
+          "response": []
+        },
+        {
+          "name": "Listar devoluciones pendientes",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/admin/cancelaciones/devolucion-pendiente",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "cancelaciones",
+                "devolucion-pendiente"
+              ]
+            },
+            "description": "GET /admin/cancelaciones/devolucion-pendiente. Requiere administrador. Devuelve pedidos cancelados con devolucion_pendiente=true."
+          },
+          "response": []
+        },
+        {
+          "name": "Resumen de cancelaciones",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/admin/cancelaciones/resumen?fecha={{fecha}}&sede_id={{sede_id}}",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "cancelaciones",
+                "resumen"
+              ],
+              "query": [
+                {
+                  "key": "fecha",
+                  "value": "{{fecha}}",
+                  "description": "Fecha del resumen en formato YYYY-MM-DD. Si se omite usa hoy."
+                },
+                {
+                  "key": "sede_id",
+                  "value": "{{sede_id}}",
+                  "description": "Filtra por sede.",
+                  "disabled": false
+                }
+              ]
+            },
+            "description": "GET /admin/cancelaciones/resumen. Devuelve totales del dia: total, por cliente, por administracion y con devolucion pendiente."
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

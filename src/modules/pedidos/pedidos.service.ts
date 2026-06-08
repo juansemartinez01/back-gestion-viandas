@@ -21,6 +21,7 @@ import { UpdatePedidoDto } from './dto/update-pedido.dto';
 import { QueryPedidoDto } from './dto/query-pedido.dto';
 import { CancelarPedidoDto } from './dto/cancelar-pedido.dto';
 import { PagosService } from 'src/modules/pagos/pagos.service';
+import { StockViandasService } from 'src/modules/stock-viandas/stock-viandas.service';
 
 @Injectable()
 export class PedidosService extends BaseCrudTenantService<Pedido> {
@@ -33,6 +34,8 @@ export class PedidosService extends BaseCrudTenantService<Pedido> {
     private readonly pagosService: PagosService,
     @Inject(forwardRef(() => MercadoPagoService))
     private readonly mercadoPagoService: MercadoPagoService,
+    @Inject(forwardRef(() => StockViandasService))
+    private readonly stockViandasService: StockViandasService,
   ) {
     super(pedidoRepo);
   }
@@ -383,6 +386,7 @@ export class PedidosService extends BaseCrudTenantService<Pedido> {
 
     const saved = await this.pedidoRepo.save(pedido);
     await this.pagosService.cancelarPago(saved.id, tenantId);
+    await this.stockViandasService.reasignarCancelacion(saved.id, tenantId);
     return saved;
   }
 
@@ -419,6 +423,7 @@ export class PedidosService extends BaseCrudTenantService<Pedido> {
 
     const saved = await this.pedidoRepo.save(pedido);
     await this.pagosService.cancelarPago(saved.id, tenantId);
+    await this.stockViandasService.reasignarCancelacion(saved.id, tenantId);
     return saved;
   }
 

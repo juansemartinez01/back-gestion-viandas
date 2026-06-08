@@ -7,6 +7,7 @@ import { PuntosRetiroModule } from 'src/modules/puntos-retiro/puntos-retiro.modu
 import { AuditModule } from 'src/modules/audit/audit.module';
 import { PagosModule } from 'src/modules/pagos/pagos.module';
 import { MercadoPagoModule } from 'src/modules/mercado-pago/mercado-pago.module';
+import { StockViandasModule } from 'src/modules/stock-viandas/stock-viandas.module';
 import { Pedido } from './entities/pedido.entity';
 import { PedidosService } from './pedidos.service';
 import { PedidosController } from './pedidos.controller';
@@ -23,6 +24,7 @@ import { PedidosExpiracionJob } from './pedidos-expiracion.job';
     AuditModule,
     PagosModule,
     forwardRef(() => MercadoPagoModule),
+    forwardRef(() => StockViandasModule),
   ],
   providers: [PedidosService, PedidosExpiracionJob],
   controllers: [PedidosController, PublicPedidosController],

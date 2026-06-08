@@ -1,0 +1,308 @@
+{
+  "info": {
+    "_postman_id": "2d29f462-111a-4f71-9b0a-stockviandas01",
+    "name": "Stock Viandas - Rochester API",
+    "description": "Coleccion para importar en Postman con los endpoints del modulo Stock Viandas. Todos los endpoints requieren Bearer token y tenant.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "url",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "tenant",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "tenant_key",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "stock_vianda_id",
+      "value": "00000000-0000-0000-0000-000000000000",
+      "type": "string"
+    },
+    {
+      "key": "fecha",
+      "value": "2026-06-08",
+      "type": "string"
+    },
+    {
+      "key": "sede_id",
+      "value": "00000000-0000-0000-0000-000000000000",
+      "type": "string"
+    },
+    {
+      "key": "punto_retiro_id",
+      "value": "00000000-0000-0000-0000-000000000000",
+      "type": "string"
+    },
+    {
+      "key": "menu_publicado_id",
+      "value": "00000000-0000-0000-0000-000000000000",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Admin Stock Viandas",
+      "description": "Endpoints administrativos para consultar stock de viandas, ver detalle, ajustar stock manualmente y revisar movimientos. Roles permitidos: administrador, supervisor y operador_caja para listado/detalle/ajuste; movimientos solo administrador y supervisor.",
+      "item": [
+        {
+          "name": "Listar stock de viandas",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/admin/stock-viandas?page=1&limit=20&fecha={{fecha}}&sede_id={{sede_id}}&punto_retiro_id={{punto_retiro_id}}&menu_publicado_id={{menu_publicado_id}}",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "stock-viandas"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Numero de pagina. Minimo 1."
+                },
+                {
+                  "key": "limit",
+                  "value": "20",
+                  "description": "Cantidad de registros por pagina. Minimo 1, maximo 100."
+                },
+                {
+                  "key": "fecha",
+                  "value": "{{fecha}}",
+                  "description": "Fecha exacta del stock en formato YYYY-MM-DD."
+                },
+                {
+                  "key": "sede_id",
+                  "value": "{{sede_id}}",
+                  "description": "UUID de la sede."
+                },
+                {
+                  "key": "punto_retiro_id",
+                  "value": "{{punto_retiro_id}}",
+                  "description": "UUID del punto de retiro."
+                },
+                {
+                  "key": "menu_publicado_id",
+                  "value": "{{menu_publicado_id}}",
+                  "description": "UUID del menu publicado."
+                }
+              ]
+            },
+            "description": "Lista el stock de viandas del tenant autenticado. Permite filtrar por fecha, sede, punto de retiro y menu publicado. Devuelve respuesta paginada."
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener stock de vianda por ID",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/admin/stock-viandas/{{stock_vianda_id}}",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "stock-viandas",
+                "{{stock_vianda_id}}"
+              ]
+            },
+            "description": "Obtiene el detalle de un registro de stock de vianda. Incluye relaciones con sede, punto de retiro, menu publicado y menu base."
+          },
+          "response": []
+        },
+        {
+          "name": "Ajustar stock de vianda",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipo\": \"positivo\",\n  \"cantidad\": 5,\n  \"observacion\": \"Ajuste manual por recuento fisico.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url}}/admin/stock-viandas/{{stock_vianda_id}}/ajustar",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "stock-viandas",
+                "{{stock_vianda_id}}",
+                "ajustar"
+              ]
+            },
+            "description": "Realiza un ajuste manual positivo o negativo sobre stock_ajustado, recalcula stock_restante y registra un movimiento de stock. Body: tipo debe ser positivo o negativo; cantidad debe ser entero mayor o igual a 1; observacion es opcional."
+          },
+          "response": []
+        },
+        {
+          "name": "Listar movimientos de stock de vianda",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/admin/stock-viandas/{{stock_vianda_id}}/movimientos",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "stock-viandas",
+                "{{stock_vianda_id}}",
+                "movimientos"
+              ]
+            },
+            "description": "Lista los movimientos asociados a un stock de vianda, ordenados por fecha de creacion ascendente. Requiere rol administrador o supervisor."
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
