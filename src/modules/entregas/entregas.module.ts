@@ -8,6 +8,7 @@ import { StockViandasModule } from 'src/modules/stock-viandas/stock-viandas.modu
 import { Pedido } from 'src/modules/pedidos/entities/pedido.entity';
 import { StockVianda } from 'src/modules/stock-viandas/entities/stock-vianda.entity';
 import { Pago } from 'src/modules/pagos/entities/pago.entity';
+import { CierresOperativosModule } from 'src/modules/cierres-operativos/cierres-operativos.module';
 import { EntregaPedido } from './entities/entrega-pedido.entity';
 import { EntregasService } from './entregas.service';
 import { EntregasController } from './entregas.controller';
@@ -20,6 +21,7 @@ import { EntregasController } from './entregas.controller';
     StockViandasModule,
     AuditModule,
     TenancyModule,
+    CierresOperativosModule,
   ],
   providers: [EntregasService],
   controllers: [EntregasController],

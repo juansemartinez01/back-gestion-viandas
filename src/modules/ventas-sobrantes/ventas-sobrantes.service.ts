@@ -6,6 +6,7 @@ import { ErrorCodes } from 'src/common/errors/error-codes';
 import { auditLogPayload } from 'src/common/audit/audit.util';
 import { AuditService } from 'src/modules/audit/audit.service';
 import { TenancyService } from 'src/modules/tenancy/tenancy.service';
+import { CierresOperativosService } from 'src/modules/cierres-operativos/cierres-operativos.service';
 import { MenuPublicado } from 'src/modules/menus-publicados/entities/menu-publicado.entity';
 import { OrdenProduccionVianda, EstadoOrdenProduccion } from 'src/modules/produccion-viandas/entities/orden-produccion-vianda.entity';
 import { StockVianda } from 'src/modules/stock-viandas/entities/stock-vianda.entity';
@@ -35,6 +36,7 @@ export class VentasSobrantesService {
     private readonly dataSource: DataSource,
     private readonly tenancyService: TenancyService,
     private readonly auditService: AuditService,
+    private readonly cierresOperativosService: CierresOperativosService,
   ) {}
 
   async registrarVenta(
@@ -42,6 +44,21 @@ export class VentasSobrantesService {
     usuarioId: string,
   ): Promise<VentaSobrante> {
     const tenantId = this.tenancyService.requireTenantId();
+
+    const diaCerrado = await this.cierresOperativosService.isDiaCerrado(
+      dto.fecha,
+      dto.sede_id,
+      dto.punto_retiro_id,
+      tenantId,
+    );
+    if (diaCerrado) {
+      throw new AppError({
+        code: ErrorCodes.CIERRE_DIA_CERRADO,
+        message: 'El día operativo ya fue cerrado para este punto de retiro',
+        status: 409,
+        details: { fecha: dto.fecha, punto_retiro_id: dto.punto_retiro_id },
+      });
+    }
 
     const qr = this.dataSource.createQueryRunner();
     await qr.connect();

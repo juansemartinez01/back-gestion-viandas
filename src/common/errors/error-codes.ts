@@ -126,6 +126,11 @@ export const ErrorCodes = {
   // ventas-sobrantes
   VENTA_SOBRANTE_NOT_FOUND: 'VENTA_SOBRANTE_NOT_FOUND',
   SOBRANTE_PRODUCCION_NO_CONFIRMADA: 'SOBRANTE_PRODUCCION_NO_CONFIRMADA',
+
+  // cierres-operativos
+  CIERRE_OPERATIVO_NOT_FOUND: 'CIERRE_OPERATIVO_NOT_FOUND',
+  CIERRE_YA_EXISTE: 'CIERRE_YA_EXISTE',
+  CIERRE_DIA_CERRADO: 'CIERRE_DIA_CERRADO',
 } as const;
 
 export type ErrorCode = (typeof ErrorCodes)[keyof typeof ErrorCodes];

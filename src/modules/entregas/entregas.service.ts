@@ -7,6 +7,7 @@ import { auditLogPayload } from 'src/common/audit/audit.util';
 import { AuditService } from 'src/modules/audit/audit.service';
 import { TenancyService } from 'src/modules/tenancy/tenancy.service';
 import { StockViandasService } from 'src/modules/stock-viandas/stock-viandas.service';
+import { CierresOperativosService } from 'src/modules/cierres-operativos/cierres-operativos.service';
 import { Pedido } from 'src/modules/pedidos/entities/pedido.entity';
 import { EstadoPedido, MedioPagoPedido } from 'src/modules/pedidos/pedido.enums';
 import { StockVianda } from 'src/modules/stock-viandas/entities/stock-vianda.entity';
@@ -32,6 +33,7 @@ export class EntregasService {
     private readonly tenancyService: TenancyService,
     private readonly auditService: AuditService,
     private readonly stockViandasService: StockViandasService,
+    private readonly cierresOperativosService: CierresOperativosService,
   ) {}
 
   async registrarEntrega(
@@ -72,6 +74,21 @@ export class EntregasService {
           message: 'El pedido no está en un estado que permita la entrega',
           status: 409,
           details: { estado_pedido: pedido.estado_pedido },
+        });
+      }
+
+      const diaCerrado = await this.cierresOperativosService.isDiaCerrado(
+        pedido.fecha_retiro,
+        pedido.sede_id,
+        pedido.punto_retiro_id,
+        tenantId,
+      );
+      if (diaCerrado) {
+        throw new AppError({
+          code: ErrorCodes.CIERRE_DIA_CERRADO,
+          message: 'El día operativo ya fue cerrado para este punto de retiro',
+          status: 409,
+          details: { fecha: pedido.fecha_retiro, punto_retiro_id: pedido.punto_retiro_id },
         });
       }
 

@@ -9,6 +9,7 @@ import { StockVianda } from 'src/modules/stock-viandas/entities/stock-vianda.ent
 import { MovimientoStockVianda } from 'src/modules/stock-viandas/entities/movimiento-stock-vianda.entity';
 import { MenuPublicado } from 'src/modules/menus-publicados/entities/menu-publicado.entity';
 import { OrdenProduccionVianda } from 'src/modules/produccion-viandas/entities/orden-produccion-vianda.entity';
+import { CierresOperativosModule } from 'src/modules/cierres-operativos/cierres-operativos.module';
 import { VentaSobrante } from './entities/venta-sobrante.entity';
 import { VentasSobrantesService } from './ventas-sobrantes.service';
 import { VentasSobrantesController } from './ventas-sobrantes.controller';
@@ -27,6 +28,7 @@ import { VentasSobrantesController } from './ventas-sobrantes.controller';
     ProduccionViandasModule,
     AuditModule,
     TenancyModule,
+    CierresOperativosModule,
   ],
   providers: [VentasSobrantesService],
   controllers: [VentasSobrantesController],
