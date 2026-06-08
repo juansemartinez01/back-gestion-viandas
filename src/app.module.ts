@@ -32,6 +32,7 @@ import { CancelacionesPedidosModule } from './modules/cancelaciones-pedidos/canc
 import { ProduccionViandasModule } from './modules/produccion-viandas/produccion-viandas.module';
 import { StockViandasModule } from './modules/stock-viandas/stock-viandas.module';
 import { EntregasModule } from './modules/entregas/entregas.module';
+import { VentasSobrantesModule } from './modules/ventas-sobrantes/ventas-sobrantes.module';
 
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { ObservabilityModule } from './infra/observability/observability.module';
@@ -81,6 +82,7 @@ import { ObservabilityModule } from './infra/observability/observability.module'
     ProduccionViandasModule,
     StockViandasModule,
     EntregasModule,
+    VentasSobrantesModule,
   ],
   controllers: [AppController],
   providers: [
