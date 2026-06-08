@@ -4,7 +4,7 @@ export class CreateMenusPublicados1780847258897 implements MigrationInterface {
     name = 'CreateMenusPublicados1780847258897'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.query(`DROP INDEX "public"."uq_menus_base_tenant_nombre"`);
+        await queryRunner.query(`DROP INDEX "public"."UQ_menus_base_tenant_nombre"`);
         await queryRunner.query(`CREATE TYPE "public"."menus_publicados_tipo_sobreproduccion_enum" AS ENUM('cantidad_fija', 'porcentaje')`);
         await queryRunner.query(`CREATE TYPE "public"."menus_publicados_estado_enum" AS ENUM('activo', 'pausado', 'cerrado', 'agotado', 'cancelado')`);
         await queryRunner.query(`CREATE TABLE "menus_publicados" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "tenant_id" uuid, "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "deleted_at" TIMESTAMP WITH TIME ZONE, "menu_base_id" uuid NOT NULL, "sede_id" uuid NOT NULL, "fecha_venta" date NOT NULL, "precio_encargo" numeric(10,2) NOT NULL, "precio_sobrante" numeric(10,2), "fecha_hora_limite_encargo" TIMESTAMP WITH TIME ZONE NOT NULL, "fecha_hora_limite_cancelacion" TIMESTAMP WITH TIME ZONE, "limite_maximo_viandas" integer, "tipo_sobreproduccion" "public"."menus_publicados_tipo_sobreproduccion_enum", "valor_sobreproduccion" numeric(8,2), "estado" "public"."menus_publicados_estado_enum" NOT NULL DEFAULT 'activo', "imagen_public_id" character varying(500), "imagen_url" character varying(1000), "observaciones" text, CONSTRAINT "PK_6a0a689a6d7b6d03dc3941802a4" PRIMARY KEY ("id"))`);
@@ -34,7 +34,7 @@ export class CreateMenusPublicados1780847258897 implements MigrationInterface {
         await queryRunner.query(`DROP TABLE "menus_publicados"`);
         await queryRunner.query(`DROP TYPE "public"."menus_publicados_estado_enum"`);
         await queryRunner.query(`DROP TYPE "public"."menus_publicados_tipo_sobreproduccion_enum"`);
-        await queryRunner.query(`CREATE UNIQUE INDEX "uq_menus_base_tenant_nombre" ON "menus_base" ("nombre", "tenant_id") WHERE (deleted_at IS NULL)`);
+        await queryRunner.query(`CREATE UNIQUE INDEX "UQ_menus_base_tenant_nombre" ON "menus_base" ("nombre", "tenant_id") WHERE (deleted_at IS NULL)`);
     }
 
 }
