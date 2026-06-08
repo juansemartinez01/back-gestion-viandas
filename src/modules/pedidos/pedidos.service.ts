@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, QueryRunner, Repository } from 'typeorm';
 import { BaseCrudTenantService } from 'src/common/crud/base-crud.service';
@@ -7,6 +7,7 @@ import { ErrorCodes } from 'src/common/errors/error-codes';
 import { ClientesService } from 'src/modules/clientes/clientes.service';
 import { MenusPublicadosService } from 'src/modules/menus-publicados/menus-publicados.service';
 import { EstadoMenuPublicado } from 'src/modules/menus-publicados/entities/menu-publicado.entity';
+import { MercadoPagoService } from 'src/modules/mercado-pago/mercado-pago.service';
 import { Pedido } from './entities/pedido.entity';
 import {
   EstadoPagoPedido,
@@ -30,6 +31,8 @@ export class PedidosService extends BaseCrudTenantService<Pedido> {
     private readonly menusPublicadosService: MenusPublicadosService,
     private readonly clientesService: ClientesService,
     private readonly pagosService: PagosService,
+    @Inject(forwardRef(() => MercadoPagoService))
+    private readonly mercadoPagoService: MercadoPagoService,
   ) {
     super(pedidoRepo);
   }
@@ -199,6 +202,19 @@ export class PedidosService extends BaseCrudTenantService<Pedido> {
       }
 
       await qr.commitTransaction();
+
+      if (dto.medio_pago === MedioPagoPedido.MERCADO_PAGO) {
+        const { preference_id, init_point } =
+          await this.mercadoPagoService.generarPreferencia(
+            saved.id,
+            saved.importe_total,
+            `Pedido ${saved.codigo_publico}`,
+          );
+        saved.mp_preference_id = preference_id;
+        saved.mp_init_point = init_point;
+        await this.pedidoRepo.save(saved);
+      }
+
       return saved;
     } catch (err) {
       await qr.rollbackTransaction();
@@ -421,5 +437,41 @@ export class PedidosService extends BaseCrudTenantService<Pedido> {
 
     await this.pedidoRepo.save(pedido);
     return this.findOne(id);
+  }
+
+  async confirmarPagoOnline(pedidoId: string, tenantId: string): Promise<void> {
+    const pedido = await this.pedidoRepo
+      .createQueryBuilder('p')
+      .where('p.id = :id', { id: pedidoId })
+      .andWhere('p.tenant_id = :tenantId', { tenantId })
+      .andWhere('p.deleted_at IS NULL')
+      .getOne();
+
+    if (!pedido) {
+      throw new AppError({
+        code: ErrorCodes.PEDIDO_NOT_FOUND,
+        message: 'Pedido no encontrado',
+        status: 404,
+        details: { id: pedidoId },
+      });
+    }
+
+    if (pedido.estado_pedido === EstadoPedido.CONFIRMADO_PAGO_ONLINE) {
+      return;
+    }
+
+    if (pedido.estado_pedido !== EstadoPedido.PENDIENTE_PAGO_ONLINE) {
+      throw new AppError({
+        code: ErrorCodes.PEDIDO_NO_CANCELABLE,
+        message: `No se puede confirmar pago online: el pedido está en estado ${pedido.estado_pedido}`,
+        status: 409,
+        details: { estado_pedido: pedido.estado_pedido },
+      });
+    }
+
+    pedido.estado_pedido = EstadoPedido.CONFIRMADO_PAGO_ONLINE;
+    pedido.expires_at = null;
+    pedido.fecha_confirmacion = new Date();
+    await this.pedidoRepo.save(pedido);
   }
 }

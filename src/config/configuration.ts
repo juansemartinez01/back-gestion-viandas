@@ -89,6 +89,17 @@ export default () => ({
     },
   },
   // ==========================
+  // Mercado Pago
+  // ==========================
+  mercadoPago: {
+    accessToken: process.env.MP_ACCESS_TOKEN ?? null,
+    webhookSecret: process.env.MP_WEBHOOK_SECRET ?? null,
+    successUrl: process.env.MP_SUCCESS_URL ?? null,
+    failureUrl: process.env.MP_FAILURE_URL ?? null,
+    pendingUrl: process.env.MP_PENDING_URL ?? null,
+  },
+
+  // ==========================
   // Files
   // ==========================
   files: {

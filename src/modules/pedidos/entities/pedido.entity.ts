@@ -103,6 +103,12 @@ export class Pedido extends BaseEntity {
   @Column({ type: 'boolean', default: false })
   devolucion_pendiente!: boolean;
 
+  @Column({ type: 'varchar', length: 100, nullable: true })
+  mp_preference_id!: string | null;
+
+  @Column({ type: 'text', nullable: true })
+  mp_init_point!: string | null;
+
   @ManyToOne(() => Cliente, { eager: false })
   @JoinColumn({ name: 'cliente_id' })
   cliente!: Cliente;

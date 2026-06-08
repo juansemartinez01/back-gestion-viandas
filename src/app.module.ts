@@ -27,6 +27,7 @@ import { MenusPublicadosModule } from './modules/menus-publicados/menus-publicad
 import { BannersPromocionesModule } from './modules/banners-promociones/banners-promociones.module';
 import { PedidosModule } from './modules/pedidos/pedidos.module';
 import { PagosModule } from './modules/pagos/pagos.module';
+import { MercadoPagoModule } from './modules/mercado-pago/mercado-pago.module';
 
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { ObservabilityModule } from './infra/observability/observability.module';
@@ -71,6 +72,7 @@ import { ObservabilityModule } from './infra/observability/observability.module'
     BannersPromocionesModule,
     PedidosModule,
     PagosModule,
+    MercadoPagoModule,
   ],
   controllers: [AppController],
   providers: [

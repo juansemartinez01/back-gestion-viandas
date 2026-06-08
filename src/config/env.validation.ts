@@ -143,6 +143,29 @@ class EnvVars {
   THROTTLE_LIMIT?: number;
 
   // ==========================
+  // Mercado Pago
+  // ==========================
+  @IsOptional()
+  @IsString()
+  MP_ACCESS_TOKEN?: string;
+
+  @IsOptional()
+  @IsString()
+  MP_WEBHOOK_SECRET?: string;
+
+  @IsOptional()
+  @IsString()
+  MP_SUCCESS_URL?: string;
+
+  @IsOptional()
+  @IsString()
+  MP_FAILURE_URL?: string;
+
+  @IsOptional()
+  @IsString()
+  MP_PENDING_URL?: string;
+
+  // ==========================
   // Observability
   // ==========================
   @IsOptional()

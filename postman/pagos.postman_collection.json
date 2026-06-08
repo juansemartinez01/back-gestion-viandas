@@ -1,0 +1,85 @@
+{
+  "info": {
+    "_postman_id": "21a44b80-c490-4279-85df-a734e257b42e",
+    "name": "Backend Rochester - Pagos",
+    "description": "Coleccion para probar los endpoints del modulo Pagos. Usa {{url}}, {{token}}, {{tenant}} y {{pedido_id}}. Este modulo expone solo consulta admin por pedido; creacion, actualizacion, cobro presencial y cancelacion de pagos son metodos internos del service.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "url",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "tenant",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "tenant_key",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "pedido_id",
+      "value": "00000000-0000-0000-0000-000000000000",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Admin Pagos",
+      "description": "Endpoint protegido por JWT y roles administrador, supervisor u operador_caja.",
+      "item": [
+        {
+          "name": "Obtener pago por pedido",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/admin/pagos/{{pedido_id}}",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "pagos",
+                "{{pedido_id}}"
+              ]
+            },
+            "description": "GET /admin/pagos/:pedidoId. Devuelve el pago asociado al pedido dentro del tenant actual."
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

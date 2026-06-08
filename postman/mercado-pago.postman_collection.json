@@ -1,0 +1,233 @@
+{
+  "info": {
+    "_postman_id": "340f80b8-e13e-4a21-a59d-83c422f38e03",
+    "name": "Backend Rochester - Mercado Pago",
+    "description": "Coleccion para probar los endpoints del modulo Mercado Pago. Usa {{url}}, {{token}}, {{tenant}}, {{pedido_id}}, {{mp_webhook_log_id}}, {{mp_payment_id}}, {{mp_signature}}, {{mp_request_id}} y {{mp_timestamp}}. La generacion de preferencias existe como metodo interno del service y no expone endpoint directo en este controller.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "url",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "tenant",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "tenant_key",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "pedido_id",
+      "value": "00000000-0000-0000-0000-000000000000",
+      "type": "string"
+    },
+    {
+      "key": "mp_webhook_log_id",
+      "value": "00000000-0000-0000-0000-000000000000",
+      "type": "string"
+    },
+    {
+      "key": "mp_payment_id",
+      "value": "123456789",
+      "type": "string"
+    },
+    {
+      "key": "mp_signature",
+      "value": "ts=1717776000,v1=example-signature",
+      "type": "string"
+    },
+    {
+      "key": "mp_request_id",
+      "value": "request-123",
+      "type": "string"
+    },
+    {
+      "key": "mp_timestamp",
+      "value": "1717776000",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Admin Mercado Pago",
+      "description": "Endpoints protegidos por JWT y rol administrador para auditar logs de webhooks.",
+      "item": [
+        {
+          "name": "Listar logs de webhook",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/admin/mercado-pago/logs?page=1&limit=20&pedido_id={{pedido_id}}&resultado=procesado_ok",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "mercado-pago",
+                "logs"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Pagina desde 1."
+                },
+                {
+                  "key": "limit",
+                  "value": "20",
+                  "description": "Cantidad por pagina. Maximo 100."
+                },
+                {
+                  "key": "pedido_id",
+                  "value": "{{pedido_id}}",
+                  "description": "Filtra logs asociados a un pedido.",
+                  "disabled": true
+                },
+                {
+                  "key": "resultado",
+                  "value": "procesado_ok",
+                  "description": "procesado_ok | procesado_error | pendiente_revision"
+                }
+              ]
+            },
+            "description": "GET /admin/mercado-pago/logs. Devuelve logs paginados, ordenados por fecha_recepcion DESC."
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener log de webhook por id",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/admin/mercado-pago/logs/{{mp_webhook_log_id}}",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "mercado-pago",
+                "logs",
+                "{{mp_webhook_log_id}}"
+              ]
+            },
+            "description": "GET /admin/mercado-pago/logs/:id. Devuelve el log completo, incluyendo payload."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Webhook Mercado Pago",
+      "description": "Endpoint publico usado por Mercado Pago. Siempre responde 200 con received=true; los errores se guardan como logs.",
+      "item": [
+        {
+          "name": "Recibir webhook de pago",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              },
+              {
+                "key": "x-signature",
+                "value": "{{mp_signature}}",
+                "type": "text",
+                "description": "Requerido solo si MP_WEBHOOK_SECRET esta configurado."
+              },
+              {
+                "key": "x-request-id",
+                "value": "{{mp_request_id}}",
+                "type": "text",
+                "description": "Usado para validar firma HMAC si hay secret."
+              },
+              {
+                "key": "x-timestamp",
+                "value": "{{mp_timestamp}}",
+                "type": "text",
+                "description": "Usado para validar firma HMAC si hay secret."
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"payment\",\n  \"action\": \"payment.updated\",\n  \"data\": {\n    \"id\": \"{{mp_payment_id}}\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{url}}/webhooks/mercado-pago",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "webhooks",
+                "mercado-pago"
+              ]
+            },
+            "description": "POST /webhooks/mercado-pago. Si type=payment y data.id existe, consulta el pago en Mercado Pago y actualiza pago/pedido segun status."
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
