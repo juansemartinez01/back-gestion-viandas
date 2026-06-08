@@ -15,9 +15,14 @@ FROM node:20-alpine
 WORKDIR /app
 
 COPY package*.json ./
-RUN npm ci --omit=dev
+RUN npm ci
 
 COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/migrations ./migrations
+COPY --from=builder /app/src ./src
+COPY tsconfig.json tsconfig.build.json nest-cli.json ./
+COPY docker-entrypoint.sh .
+RUN chmod +x docker-entrypoint.sh
 
 EXPOSE 3000
-CMD ["node", "dist/main.js"]
+CMD ["sh", "docker-entrypoint.sh"]
