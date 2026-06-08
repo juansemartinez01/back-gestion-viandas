@@ -1,0 +1,327 @@
+{
+  "info": {
+    "_postman_id": "b8f2ac22-7f8d-497a-a4ce-cierresoperativos01",
+    "name": "Cierres Operativos - Rochester API",
+    "description": "Coleccion para importar en Postman con los endpoints del modulo Cierres Operativos. Todos los endpoints requieren Bearer token y tenant.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "url",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "tenant",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "tenant_key",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "cierre_operativo_id",
+      "value": "00000000-0000-0000-0000-000000000000",
+      "type": "string"
+    },
+    {
+      "key": "fecha",
+      "value": "2026-06-08",
+      "type": "string"
+    },
+    {
+      "key": "fecha_desde",
+      "value": "2026-06-01",
+      "type": "string"
+    },
+    {
+      "key": "fecha_hasta",
+      "value": "2026-06-30",
+      "type": "string"
+    },
+    {
+      "key": "sede_id",
+      "value": "00000000-0000-0000-0000-000000000000",
+      "type": "string"
+    },
+    {
+      "key": "punto_retiro_id",
+      "value": "00000000-0000-0000-0000-000000000000",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Admin Cierres Operativos",
+      "description": "Endpoints administrativos para consultar resumen previo, ejecutar cierre operativo, listar cierres y consultar detalle. Resumen previo y ejecucion requieren administrador u operador_caja. Listado y detalle permiten administrador, supervisor y operador_caja.",
+      "item": [
+        {
+          "name": "Obtener resumen previo de cierre",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/admin/cierres-operativos/resumen-previo?fecha={{fecha}}&sede_id={{sede_id}}&punto_retiro_id={{punto_retiro_id}}",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "cierres-operativos",
+                "resumen-previo"
+              ],
+              "query": [
+                {
+                  "key": "fecha",
+                  "value": "{{fecha}}",
+                  "description": "Fecha operativa a consultar en formato YYYY-MM-DD. Requerido."
+                },
+                {
+                  "key": "sede_id",
+                  "value": "{{sede_id}}",
+                  "description": "UUID de la sede. Requerido."
+                },
+                {
+                  "key": "punto_retiro_id",
+                  "value": "{{punto_retiro_id}}",
+                  "description": "UUID del punto de retiro. Requerido."
+                }
+              ]
+            },
+            "description": "Calcula el resumen previo antes de cerrar un dia operativo para una fecha, sede y punto de retiro. Devuelve entregados, pedidos que pasarian a no retirado, cancelados, ventas de sobrantes, recaudacion estimada y si el dia ya esta cerrado."
+          },
+          "response": []
+        },
+        {
+          "name": "Ejecutar cierre operativo",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fecha_operativa\": \"2026-06-08\",\n  \"sede_id\": \"{{sede_id}}\",\n  \"punto_retiro_id\": \"{{punto_retiro_id}}\",\n  \"observacion\": \"Cierre operativo realizado al finalizar la jornada.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url}}/admin/cierres-operativos",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "cierres-operativos"
+              ]
+            },
+            "description": "Ejecuta el cierre operativo de una fecha, sede y punto de retiro. Si existen pedidos confirmados no entregados para esa combinacion, los marca como no_retirado. Calcula entregados, ventas de sobrantes y recaudacion presencial. No permite duplicar cierre para la misma fecha, sede y punto."
+          },
+          "response": []
+        },
+        {
+          "name": "Listar cierres operativos",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/admin/cierres-operativos?page=1&limit=20&fecha_desde={{fecha_desde}}&fecha_hasta={{fecha_hasta}}&sede_id={{sede_id}}&punto_retiro_id={{punto_retiro_id}}",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "cierres-operativos"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Numero de pagina. Minimo 1."
+                },
+                {
+                  "key": "limit",
+                  "value": "20",
+                  "description": "Cantidad de registros por pagina. Minimo 1, maximo 100."
+                },
+                {
+                  "key": "fecha_desde",
+                  "value": "{{fecha_desde}}",
+                  "description": "Fecha operativa inicial en formato YYYY-MM-DD."
+                },
+                {
+                  "key": "fecha_hasta",
+                  "value": "{{fecha_hasta}}",
+                  "description": "Fecha operativa final en formato YYYY-MM-DD."
+                },
+                {
+                  "key": "sede_id",
+                  "value": "{{sede_id}}",
+                  "description": "UUID de la sede."
+                },
+                {
+                  "key": "punto_retiro_id",
+                  "value": "{{punto_retiro_id}}",
+                  "description": "UUID del punto de retiro."
+                }
+              ]
+            },
+            "description": "Lista cierres operativos del tenant con filtros opcionales por rango de fecha operativa, sede y punto de retiro. Devuelve respuesta paginada ordenada por fecha_operativa descendente."
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener cierre operativo por ID",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/admin/cierres-operativos/{{cierre_operativo_id}}",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "cierres-operativos",
+                "{{cierre_operativo_id}}"
+              ]
+            },
+            "description": "Obtiene el detalle de un cierre operativo por ID."
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

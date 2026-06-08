@@ -30,7 +30,10 @@ export class MercadoPagoService {
       });
     }
 
-    const body = {
+    const isPublicUrl = (url: string | null | undefined) =>
+      !!url && url.startsWith('https://');
+
+    const body: Record<string, unknown> = {
       items: [
         {
           id: pedidoId,
@@ -46,8 +49,12 @@ export class MercadoPagoService {
         failure: failureUrl ?? '',
         pending: pendingUrl ?? '',
       },
-      auto_return: 'approved',
     };
+
+    // auto_return requiere una back_url.success pública (HTTPS). Se omite en desarrollo.
+    if (isPublicUrl(successUrl)) {
+      body.auto_return = 'approved';
+    }
 
     let response: Response;
     try {

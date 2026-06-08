@@ -1,0 +1,352 @@
+{
+  "info": {
+    "_postman_id": "7f91d68a-8b42-4da8-a6a7-entregas0001",
+    "name": "Entregas - Rochester API",
+    "description": "Coleccion para importar en Postman con los endpoints del modulo Entregas. Todos los endpoints requieren Bearer token y tenant.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "url",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "tenant",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "tenant_key",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "entrega_id",
+      "value": "00000000-0000-0000-0000-000000000000",
+      "type": "string"
+    },
+    {
+      "key": "pedido_id",
+      "value": "00000000-0000-0000-0000-000000000000",
+      "type": "string"
+    },
+    {
+      "key": "sede_id",
+      "value": "00000000-0000-0000-0000-000000000000",
+      "type": "string"
+    },
+    {
+      "key": "punto_retiro_id",
+      "value": "00000000-0000-0000-0000-000000000000",
+      "type": "string"
+    },
+    {
+      "key": "usuario_id",
+      "value": "00000000-0000-0000-0000-000000000000",
+      "type": "string"
+    },
+    {
+      "key": "dni",
+      "value": "30111222",
+      "type": "string"
+    },
+    {
+      "key": "fecha",
+      "value": "2026-06-08",
+      "type": "string"
+    },
+    {
+      "key": "fecha_desde",
+      "value": "2026-06-08T00:00:00.000Z",
+      "type": "string"
+    },
+    {
+      "key": "fecha_hasta",
+      "value": "2026-06-08T23:59:59.999Z",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Admin Entregas",
+      "description": "Endpoints administrativos para buscar pedidos entregables, registrar entregas, listar entregas registradas y consultar detalle. Registrar entrega requiere rol administrador u operador_caja. Listado y detalle permiten administrador, supervisor y operador_caja. Buscar por DNI permite administrador u operador_caja.",
+      "item": [
+        {
+          "name": "Registrar entrega",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pedido_id\": \"{{pedido_id}}\",\n  \"punto_retiro_id\": \"{{punto_retiro_id}}\",\n  \"observacion\": \"Entrega realizada en mostrador. Cliente presenta DNI.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url}}/admin/entregas",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "entregas"
+              ]
+            },
+            "description": "Registra la entrega de un pedido confirmado. Consume stock de viandas, marca el pedido como entregado y, si el pedido es de pago presencial pendiente, registra el cobro en caja. Requiere que el dia operativo no este cerrado y que no exista una entrega previa para el pedido."
+          },
+          "response": []
+        },
+        {
+          "name": "Listar entregas",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/admin/entregas?page=1&limit=20&fecha_desde={{fecha_desde}}&fecha_hasta={{fecha_hasta}}&sede_id={{sede_id}}&punto_retiro_id={{punto_retiro_id}}&usuario_id={{usuario_id}}",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "entregas"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Numero de pagina. Minimo 1."
+                },
+                {
+                  "key": "limit",
+                  "value": "20",
+                  "description": "Cantidad de registros por pagina. Minimo 1."
+                },
+                {
+                  "key": "fecha_desde",
+                  "value": "{{fecha_desde}}",
+                  "description": "Fecha/hora inicial para filtrar por fecha_entrega. Formato ISO."
+                },
+                {
+                  "key": "fecha_hasta",
+                  "value": "{{fecha_hasta}}",
+                  "description": "Fecha/hora final para filtrar por fecha_entrega. Formato ISO."
+                },
+                {
+                  "key": "sede_id",
+                  "value": "{{sede_id}}",
+                  "description": "UUID de la sede."
+                },
+                {
+                  "key": "punto_retiro_id",
+                  "value": "{{punto_retiro_id}}",
+                  "description": "UUID del punto de retiro."
+                },
+                {
+                  "key": "usuario_id",
+                  "value": "{{usuario_id}}",
+                  "description": "UUID del usuario que registro la entrega."
+                }
+              ]
+            },
+            "description": "Lista entregas registradas del tenant, con filtros por rango de fecha de entrega, sede, punto de retiro y usuario. Devuelve respuesta paginada e incluye el pedido relacionado."
+          },
+          "response": []
+        },
+        {
+          "name": "Buscar pedidos entregables por DNI",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/admin/entregas/buscar-por-dni?dni={{dni}}&fecha={{fecha}}&sede_id={{sede_id}}&punto_retiro_id={{punto_retiro_id}}",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "entregas",
+                "buscar-por-dni"
+              ],
+              "query": [
+                {
+                  "key": "dni",
+                  "value": "{{dni}}",
+                  "description": "DNI informado en el pedido. Busqueda case-insensitive."
+                },
+                {
+                  "key": "fecha",
+                  "value": "{{fecha}}",
+                  "description": "Fecha de retiro del pedido en formato YYYY-MM-DD."
+                },
+                {
+                  "key": "sede_id",
+                  "value": "{{sede_id}}",
+                  "description": "UUID de la sede."
+                },
+                {
+                  "key": "punto_retiro_id",
+                  "value": "{{punto_retiro_id}}",
+                  "description": "UUID del punto de retiro. Opcional."
+                }
+              ]
+            },
+            "description": "Busca pedidos entregables por DNI para una fecha y sede. Solo devuelve pedidos en estado confirmado_pago_online o confirmado_pago_presencial. Incluye menu publicado y menu base."
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener entrega por ID",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/admin/entregas/{{entrega_id}}",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "entregas",
+                "{{entrega_id}}"
+              ]
+            },
+            "description": "Obtiene el detalle de una entrega por ID. Incluye el pedido relacionado."
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

@@ -46,19 +46,32 @@ export class PedidosService extends BaseCrudTenantService<Pedido> {
     qr: QueryRunner,
   ): Promise<string> {
     const prefix = `VIA-${year}-`;
-    const result = await qr.manager
+
+    // PostgreSQL no permite FOR UPDATE con funciones de agregación.
+    // Bloqueamos las filas primero, luego calculamos el MAX sobre los IDs bloqueados.
+    const lockedRows = await qr.manager
       .createQueryBuilder(Pedido, 'p')
-      .select('MAX(p.codigo_publico)', 'maxCodigo')
+      .select('p.id')
+      .addSelect('p.codigo_publico')
       .where('p.tenant_id = :tenantId', { tenantId })
       .andWhere('p.codigo_publico LIKE :prefix', { prefix: `${prefix}%` })
       .setLock('pessimistic_write')
-      .getRawOne();
+      .getMany();
 
     let seq = 1;
-    if (result?.maxCodigo) {
-      const parts = (result.maxCodigo as string).split('-');
-      const lastNum = parseInt(parts[2], 10);
-      if (!isNaN(lastNum)) seq = lastNum + 1;
+    if (lockedRows.length > 0) {
+      const ids = lockedRows.map((r) => r.id);
+      const result = await qr.manager
+        .createQueryBuilder(Pedido, 'p')
+        .select('MAX(p.codigo_publico)', 'maxCodigo')
+        .where('p.id IN (:...ids)', { ids })
+        .getRawOne();
+
+      if (result?.maxCodigo) {
+        const parts = (result.maxCodigo as string).split('-');
+        const lastNum = parseInt(parts[2], 10);
+        if (!isNaN(lastNum)) seq = lastNum + 1;
+      }
     }
 
     return `${prefix}${String(seq).padStart(6, '0')}`;
@@ -98,24 +111,40 @@ export class PedidosService extends BaseCrudTenantService<Pedido> {
       }
 
       if (menuPublicado.limite_maximo_viandas !== null) {
-        const countResult = await qr.manager
+        // PostgreSQL no permite FOR UPDATE con funciones de agregación.
+        // Primero bloqueamos las filas, luego sumamos sobre los IDs bloqueados.
+        const whereParams = {
+          tenantId,
+          mpId: menuPublicado.id,
+          fecha: menuPublicado.fecha_venta,
+          estados: [
+            EstadoPedido.CONFIRMADO_PAGO_PRESENCIAL,
+            EstadoPedido.CONFIRMADO_PAGO_ONLINE,
+            EstadoPedido.PENDIENTE_PAGO_ONLINE,
+          ],
+        };
+
+        const lockedRows = await qr.manager
           .createQueryBuilder(Pedido, 'p')
-          .select('COALESCE(SUM(p.cantidad), 0)', 'total')
-          .where('p.tenant_id = :tenantId', { tenantId })
-          .andWhere('p.menu_publicado_id = :mpId', { mpId: menuPublicado.id })
-          .andWhere('p.fecha_retiro = :fecha', { fecha: menuPublicado.fecha_venta })
-          .andWhere('p.estado_pedido IN (:...estados)', {
-            estados: [
-              EstadoPedido.CONFIRMADO_PAGO_PRESENCIAL,
-              EstadoPedido.CONFIRMADO_PAGO_ONLINE,
-              EstadoPedido.PENDIENTE_PAGO_ONLINE,
-            ],
-          })
+          .select('p.id')
+          .where('p.tenant_id = :tenantId', { tenantId: whereParams.tenantId })
+          .andWhere('p.menu_publicado_id = :mpId', { mpId: whereParams.mpId })
+          .andWhere('p.fecha_retiro = :fecha', { fecha: whereParams.fecha })
+          .andWhere('p.estado_pedido IN (:...estados)', { estados: whereParams.estados })
           .andWhere('p.deleted_at IS NULL')
           .setLock('pessimistic_write')
-          .getRawOne();
+          .getMany();
 
-        const totalActual = parseInt(countResult?.total ?? '0', 10);
+        let totalActual = 0;
+        if (lockedRows.length > 0) {
+          const ids = lockedRows.map((r) => r.id);
+          const sumResult = await qr.manager
+            .createQueryBuilder(Pedido, 'p')
+            .select('COALESCE(SUM(p.cantidad), 0)', 'total')
+            .where('p.id IN (:...ids)', { ids })
+            .getRawOne();
+          totalActual = parseInt(sumResult?.total ?? '0', 10);
+        }
         if (totalActual + dto.cantidad > menuPublicado.limite_maximo_viandas) {
           throw new AppError({
             code: ErrorCodes.PEDIDO_CAPACIDAD_AGOTADA,
@@ -220,7 +249,9 @@ export class PedidosService extends BaseCrudTenantService<Pedido> {
 
       return saved;
     } catch (err) {
-      await qr.rollbackTransaction();
+      if (qr.isTransactionActive) {
+        await qr.rollbackTransaction();
+      }
       throw err;
     } finally {
       await qr.release();

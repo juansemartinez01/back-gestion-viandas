@@ -1,0 +1,322 @@
+{
+  "info": {
+    "_postman_id": "f4fa1578-91e8-49e9-8f38-ventassobrantes01",
+    "name": "Ventas Sobrantes - Rochester API",
+    "description": "Coleccion para importar en Postman con los endpoints del modulo Ventas Sobrantes. Todos los endpoints requieren Bearer token y tenant.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "url",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "tenant",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "tenant_key",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "venta_sobrante_id",
+      "value": "00000000-0000-0000-0000-000000000000",
+      "type": "string"
+    },
+    {
+      "key": "fecha",
+      "value": "2026-06-08",
+      "type": "string"
+    },
+    {
+      "key": "sede_id",
+      "value": "00000000-0000-0000-0000-000000000000",
+      "type": "string"
+    },
+    {
+      "key": "punto_retiro_id",
+      "value": "00000000-0000-0000-0000-000000000000",
+      "type": "string"
+    },
+    {
+      "key": "menu_publicado_id",
+      "value": "00000000-0000-0000-0000-000000000000",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Admin Ventas Sobrantes",
+      "description": "Endpoints administrativos para consultar sobrantes disponibles, registrar ventas de sobrantes, listar ventas realizadas y consultar detalle. Crear venta y consultar disponibles requiere administrador u operador_caja. Listado y detalle permiten administrador, supervisor y operador_caja.",
+      "item": [
+        {
+          "name": "Registrar venta de sobrante",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fecha\": \"2026-06-08\",\n  \"sede_id\": \"{{sede_id}}\",\n  \"punto_retiro_id\": \"{{punto_retiro_id}}\",\n  \"menu_publicado_id\": \"{{menu_publicado_id}}\",\n  \"cantidad\": 2,\n  \"observacion\": \"Venta presencial de sobrante en mostrador.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url}}/admin/ventas-sobrantes",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "ventas-sobrantes"
+              ]
+            },
+            "description": "Registra una venta de viandas sobrantes. Valida que el dia operativo no este cerrado, que exista el menu publicado, que la produccion este confirmada, que exista stock y que haya sobrantes suficientes. Calcula precio_unitario desde precio_sobrante o precio_encargo, calcula importe_total, descuenta stock sobrante y registra movimiento de stock."
+          },
+          "response": []
+        },
+        {
+          "name": "Listar sobrantes disponibles",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/admin/ventas-sobrantes/disponibles?fecha={{fecha}}&sede_id={{sede_id}}&punto_retiro_id={{punto_retiro_id}}",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "ventas-sobrantes",
+                "disponibles"
+              ],
+              "query": [
+                {
+                  "key": "fecha",
+                  "value": "{{fecha}}",
+                  "description": "Fecha del stock en formato YYYY-MM-DD. Requerido."
+                },
+                {
+                  "key": "sede_id",
+                  "value": "{{sede_id}}",
+                  "description": "UUID de la sede. Requerido."
+                },
+                {
+                  "key": "punto_retiro_id",
+                  "value": "{{punto_retiro_id}}",
+                  "description": "UUID del punto de retiro. Opcional."
+                }
+              ]
+            },
+            "description": "Devuelve los menus con sobrantes disponibles para una fecha y sede. Si se envia punto_retiro_id, filtra tambien por punto de retiro. Solo devuelve items donde stock_disponible_sobrantes - stock_vendido_sobrante sea mayor a cero."
+          },
+          "response": []
+        },
+        {
+          "name": "Listar ventas de sobrantes",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/admin/ventas-sobrantes?page=1&limit=20&fecha={{fecha}}&sede_id={{sede_id}}&punto_retiro_id={{punto_retiro_id}}&menu_publicado_id={{menu_publicado_id}}",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "ventas-sobrantes"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Numero de pagina. Minimo 1."
+                },
+                {
+                  "key": "limit",
+                  "value": "20",
+                  "description": "Cantidad de registros por pagina. Minimo 1, maximo 100."
+                },
+                {
+                  "key": "fecha",
+                  "value": "{{fecha}}",
+                  "description": "Fecha de la venta en formato YYYY-MM-DD."
+                },
+                {
+                  "key": "sede_id",
+                  "value": "{{sede_id}}",
+                  "description": "UUID de la sede."
+                },
+                {
+                  "key": "punto_retiro_id",
+                  "value": "{{punto_retiro_id}}",
+                  "description": "UUID del punto de retiro."
+                },
+                {
+                  "key": "menu_publicado_id",
+                  "value": "{{menu_publicado_id}}",
+                  "description": "UUID del menu publicado."
+                }
+              ]
+            },
+            "description": "Lista ventas de sobrantes del tenant, con filtros opcionales por fecha, sede, punto de retiro y menu publicado. Devuelve respuesta paginada e incluye menu publicado y menu base."
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener venta de sobrante por ID",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-tenant-id",
+                "value": "{{tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "x-tenant-key",
+                "value": "{{tenant_key}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/admin/ventas-sobrantes/{{venta_sobrante_id}}",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "admin",
+                "ventas-sobrantes",
+                "{{venta_sobrante_id}}"
+              ]
+            },
+            "description": "Obtiene el detalle de una venta de sobrante por ID. Incluye menu publicado y menu base."
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
