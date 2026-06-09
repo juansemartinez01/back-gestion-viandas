@@ -5,14 +5,12 @@ export function makeOrmConfig(databaseUrl: string): DataSourceOptions {
     type: 'postgres',
     url: databaseUrl,
 
-    // Importante: en runtime puede ser dist (js) y en dev puede ser ts
     entities: [__dirname + '/../../modules/**/*.entity{.ts,.js}'],
 
-    // migrations en raíz del repo
-    migrations: [__dirname + '/../../../migrations/*{.ts,.js}'],
-
+    // Las migrations NO van aquí: el app compilado no puede cargar .ts sin ts-node.
+    // La CLI (data-source.ts) agrega la ruta de migrations directamente.
     synchronize: false,
-    migrationsRun: true,
+    migrationsRun: false,
     logging: false,
   };
 }

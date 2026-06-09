@@ -12,6 +12,7 @@ if (!databaseUrl) {
   throw new Error('DATABASE_URL is required');
 }
 
-export const AppDataSource = new DataSource(
-  makeOrmConfig(databaseUrl) as any, // evitamos fricción de tipos por paths js/ts
-);
+export const AppDataSource = new DataSource({
+  ...(makeOrmConfig(databaseUrl) as any),
+  migrations: [__dirname + '/../../../migrations/*{.ts,.js}'],
+});
