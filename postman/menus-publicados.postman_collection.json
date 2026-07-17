@@ -80,7 +80,7 @@
               }
             ],
             "url": {
-              "raw": "{{url}}/admin/menus-publicados?page=1&limit=20&fecha_venta=2026-06-15&sede_id={{sede_id}}&estado=activo&menu_base_id={{menu_base_id}}&sortBy=created_at&sortOrder=DESC",
+              "raw": "{{url}}/admin/menus-publicados?page=1&limit=20&fechaVentaDesde=2026-06-01&fechaVentaHasta=2026-06-30&sede_id={{sede_id}}&estado=activo&menu_base_id={{menu_base_id}}&sortBy=created_at&sortOrder=DESC",
               "host": [
                 "{{url}}"
               ],
@@ -100,9 +100,14 @@
                   "description": "Cantidad por pagina."
                 },
                 {
-                  "key": "fecha_venta",
-                  "value": "2026-06-15",
-                  "description": "Fecha de venta en formato YYYY-MM-DD."
+                  "key": "fechaVentaDesde",
+                  "value": "2026-06-01",
+                  "description": "Fecha de venta desde en formato YYYY-MM-DD."
+                },
+                {
+                  "key": "fechaVentaHasta",
+                  "value": "2026-06-30",
+                  "description": "Fecha de venta hasta en formato YYYY-MM-DD."
                 },
                 {
                   "key": "sede_id",

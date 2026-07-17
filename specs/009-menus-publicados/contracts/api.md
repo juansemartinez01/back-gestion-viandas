@@ -26,6 +26,8 @@ Lista paginada de menús publicados con filtros.
 page?          number   default 1
 limit?         number   default 20, max 200
 fecha_venta?   string   YYYY-MM-DD
+fechaVentaDesde? string YYYY-MM-DD
+fechaVentaHasta? string YYYY-MM-DD
 sede_id?       string   UUID
 estado?        string   activo|pausado|cerrado|agotado|cancelado
 menu_base_id?  string   UUID
@@ -410,9 +412,13 @@ Todos los campos de `CreateMenuPublicadoDto` son opcionales, excepto:
 
 Extiende `PageQueryDto`. Agrega:
 - `fecha_venta?`: `@IsOptional @IsDateString`
+- `fechaVentaDesde?`: `@IsOptional @IsDateString`
+- `fechaVentaHasta?`: `@IsOptional @IsDateString`
 - `sede_id?`: `@IsOptional @IsUUID`
 - `estado?`: `@IsOptional @IsEnum(EstadoMenuPublicado)`
 - `menu_base_id?`: `@IsOptional @IsUUID`
+- `sortBy?`: `@IsOptional @IsIn(['created_at', 'fecha_venta', 'precio_encargo'])`
+- `sortOrder?`: `@IsOptional @IsIn(['ASC', 'DESC'])`
 
 ### QueryMenusDisponiblesDto
 

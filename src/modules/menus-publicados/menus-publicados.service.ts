@@ -72,6 +72,16 @@ export class MenusPublicadosService extends BaseCrudTenantService<MenuPublicado>
     if (query.fecha_venta) {
       qb.andWhere('mp.fecha_venta = :fechaVenta', { fechaVenta: query.fecha_venta });
     }
+    if (query.fechaVentaDesde) {
+      qb.andWhere('mp.fecha_venta >= :fechaVentaDesde', {
+        fechaVentaDesde: query.fechaVentaDesde,
+      });
+    }
+    if (query.fechaVentaHasta) {
+      qb.andWhere('mp.fecha_venta <= :fechaVentaHasta', {
+        fechaVentaHasta: query.fechaVentaHasta,
+      });
+    }
     if (query.sede_id) {
       qb.andWhere('mp.sede_id = :sedeId', { sedeId: query.sede_id });
     }
