@@ -7,6 +7,7 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { RolesGuard } from './guards/roles.guard';
 import { Roles } from './decorators/roles.decorator';
 import { Throttle } from '@nestjs/throttler';
+import { CurrentUser } from './decorators/current-user.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -42,8 +43,19 @@ export class AuthController {
 
   @Get('me')
   @UseGuards(JwtAuthGuard)
-  me() {
-    return { ok: true };
+  me(@CurrentUser() user: any) {
+    const roles = Array.isArray(user?.roles) ? user.roles : [];
+
+    return {
+      ok: true,
+      data: {
+        id: user?.sub,
+        email: user?.email,
+        tenant_id: user?.tenant_id,
+        role: roles[0] ?? null,
+        roles,
+      },
+    };
   }
 
   @Roles('admin')
