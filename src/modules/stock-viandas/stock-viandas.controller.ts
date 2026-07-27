@@ -22,21 +22,21 @@ import { QueryStockDto } from './dto/query-stock.dto';
 export class StockViandasController {
   constructor(private readonly svc: StockViandasService) {}
 
-  @Roles('administrador', 'supervisor', 'operador_caja')
+  @Roles('administrador', 'supervisor', 'operador_caja', 'vendedor')
   @Get()
   async list(@Query() query: QueryStockDto) {
     const result = await this.svc.list(query);
     return page(result.items, result.page, result.limit, result.total);
   }
 
-  @Roles('administrador', 'supervisor', 'operador_caja')
+  @Roles('administrador', 'supervisor', 'operador_caja', 'vendedor')
   @Get(':id')
   async findOne(@Param('id') id: string) {
     const stock = await this.svc.findOne(id);
     return ok(stock);
   }
 
-  @Roles('administrador', 'supervisor', 'operador_caja')
+  @Roles('administrador', 'supervisor', 'operador_caja', 'vendedor')
   @Post(':id/ajustar')
   @HttpCode(200)
   async ajustar(

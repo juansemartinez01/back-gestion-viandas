@@ -23,7 +23,7 @@ import { BuscarPorDniDto } from './dto/buscar-por-dni.dto';
 export class EntregasController {
   constructor(private readonly svc: EntregasService) {}
 
-  @Roles('administrador', 'operador_caja')
+  @Roles('administrador', 'operador_caja', 'vendedor')
   @Post()
   @HttpCode(201)
   async registrarEntrega(@Req() req: any, @Body() dto: CrearEntregaDto) {
@@ -31,7 +31,7 @@ export class EntregasController {
     return ok(entrega);
   }
 
-  @Roles('administrador', 'supervisor', 'operador_caja')
+  @Roles('administrador', 'supervisor', 'operador_caja', 'vendedor')
   @Get()
   async list(@Query() query: QueryEntregasDto) {
     const result = await this.svc.list(query);
@@ -39,14 +39,14 @@ export class EntregasController {
   }
 
   // IMPORTANT: declared before /:id to prevent route conflict
-  @Roles('administrador', 'operador_caja')
+  @Roles('administrador', 'operador_caja', 'vendedor')
   @Get('buscar-por-dni')
   async buscarPorDni(@Query() query: BuscarPorDniDto) {
     const pedidos = await this.svc.buscarPorDni(query);
     return ok(pedidos);
   }
 
-  @Roles('administrador', 'supervisor', 'operador_caja')
+  @Roles('administrador', 'supervisor', 'operador_caja', 'vendedor')
   @Get(':id')
   async findOne(@Param('id') id: string) {
     const entrega = await this.svc.findOne(id);

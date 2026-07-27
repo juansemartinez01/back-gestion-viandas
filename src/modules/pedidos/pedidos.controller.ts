@@ -30,14 +30,14 @@ export class PedidosController {
     private readonly audit: AuditService,
   ) {}
 
-  @Roles('administrador', 'supervisor', 'operador_caja')
+  @Roles('administrador', 'supervisor', 'operador_caja', 'vendedor')
   @Get()
   async list(@Query() query: QueryPedidoDto) {
     const result = await this.svc.list(query);
     return page(result.items, result.page, result.limit, result.total);
   }
 
-  @Roles('administrador', 'supervisor', 'operador_caja')
+  @Roles('administrador', 'supervisor', 'operador_caja', 'vendedor')
   @Get(':id')
   async findOne(@Param('id') id: string) {
     const pedido = await this.svc.findOne(id);
@@ -109,7 +109,7 @@ export class PedidosController {
     return ok(pedido);
   }
 
-  @Roles('administrador', 'supervisor', 'operador_caja')
+  @Roles('administrador', 'supervisor', 'operador_caja', 'vendedor')
   @Post(':id/cancelar')
   async cancelar(
     @Req() req: any,

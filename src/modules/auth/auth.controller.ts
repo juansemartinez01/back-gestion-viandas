@@ -58,7 +58,7 @@ export class AuthController {
     };
   }
 
-  @Roles('admin')
+  @Roles('admin', 'administrador')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Get('admin-only')
   adminOnly() {

@@ -24,7 +24,7 @@ import { QueryVentasSobrantesDto } from './dto/query-ventas-sobrantes.dto';
 export class VentasSobrantesController {
   constructor(private readonly svc: VentasSobrantesService) {}
 
-  @Roles('administrador', 'operador_caja')
+  @Roles('administrador', 'operador_caja', 'vendedor')
   @Post()
   @HttpCode(201)
   async create(@Req() req: any, @Body() dto: CrearVentaSobranteDto) {
@@ -33,21 +33,21 @@ export class VentasSobrantesController {
   }
 
   // IMPORTANT: declared before /:id to prevent NestJS routing conflict
-  @Roles('administrador', 'operador_caja')
+  @Roles('administrador', 'operador_caja', 'vendedor')
   @Get('disponibles')
   async listDisponibles(@Query() query: QueryDisponiblesDto) {
     const result = await this.svc.listDisponibles(query);
     return ok(result);
   }
 
-  @Roles('administrador', 'supervisor', 'operador_caja')
+  @Roles('administrador', 'supervisor', 'operador_caja', 'vendedor')
   @Get()
   async list(@Query() query: QueryVentasSobrantesDto) {
     const result = await this.svc.list(query);
     return page(result.items, result.page, result.limit, result.total);
   }
 
-  @Roles('administrador', 'supervisor', 'operador_caja')
+  @Roles('administrador', 'supervisor', 'operador_caja', 'vendedor')
   @Get(':id')
   async findOne(@Param('id', ParseUUIDPipe) id: string) {
     const venta = await this.svc.findOne(id);

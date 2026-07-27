@@ -25,14 +25,14 @@ export class CierresOperativosController {
   constructor(private readonly svc: CierresOperativosService) {}
 
   // IMPORTANT: declared before /:id to prevent NestJS routing conflict
-  @Roles('administrador', 'operador_caja')
+  @Roles('administrador', 'operador_caja', 'vendedor')
   @Get('resumen-previo')
   async getResumenPrevio(@Query() query: QueryResumenPrevioDto) {
     const resumen = await this.svc.calcularResumenPrevio(query);
     return ok(resumen);
   }
 
-  @Roles('administrador', 'operador_caja')
+  @Roles('administrador', 'operador_caja', 'vendedor')
   @Post()
   @HttpCode(201)
   async ejecutarCierre(@Req() req: any, @Body() dto: CrearCierreDto) {
@@ -40,14 +40,14 @@ export class CierresOperativosController {
     return ok(cierre);
   }
 
-  @Roles('administrador', 'supervisor', 'operador_caja')
+  @Roles('administrador', 'supervisor', 'operador_caja', 'vendedor')
   @Get()
   async list(@Query() query: QueryCierresDto) {
     const result = await this.svc.list(query);
     return page(result.items, result.page, result.limit, result.total);
   }
 
-  @Roles('administrador', 'supervisor', 'operador_caja')
+  @Roles('administrador', 'supervisor', 'operador_caja', 'vendedor')
   @Get(':id')
   async findOne(@Param('id', ParseUUIDPipe) id: string) {
     const cierre = await this.svc.findOne(id);
