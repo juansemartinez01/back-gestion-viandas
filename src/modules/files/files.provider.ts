@@ -44,13 +44,17 @@ type CreateUploadResponse = {
   headers?: Record<string, string>;
 };
 
-function extFromMime(mime: string): 'png' | 'jpg' | 'jpeg' | 'webp' | 'pdf' {
+const SUPPORTED_IMAGE_API_MIME = [
+  'application/pdf',
+  'image/png',
+  'image/jpeg',
+];
+
+function extFromMime(mime: string): 'png' | 'jpg' | 'jpeg' | 'pdf' {
   if (mime === 'image/png') return 'png';
   if (mime === 'image/jpeg') return 'jpeg';
-  if (mime === 'image/webp') return 'webp';
   if (mime === 'application/pdf') return 'pdf';
-  // fallback safe
-  return 'jpeg';
+  throw new Error(`Mime not allowed: ${mime}`);
 }
 
 function parseCsv(v?: string): string[] {
@@ -80,7 +84,15 @@ export const FilesProvider: Provider = {
       config.get<string>('IMAGES_CLOUDFRONT_BASE');
 
     const maxBytes = Number(config.get('FILES_MAX_BYTES') ?? 15 * 1024 * 1024);
-    const allowedMime = parseCsv(config.get<string>('FILES_ALLOWED_MIME'));
+    const configuredAllowedMime = parseCsv(
+      config.get<string>('FILES_ALLOWED_MIME'),
+    );
+    const allowedMime =
+      configuredAllowedMime.length > 0
+        ? configuredAllowedMime.filter((mime) =>
+            SUPPORTED_IMAGE_API_MIME.includes(mime),
+          )
+        : SUPPORTED_IMAGE_API_MIME;
 
     if (!base) throw new Error('Missing FILES_API_BASE (or IMAGES_API_BASE)');
     if (!apiKey) throw new Error('Missing FILES_API_KEY (or IMAGES_API_KEY)');
@@ -100,7 +112,7 @@ export const FilesProvider: Provider = {
         if (!buffer?.length) throw new Error('Missing file buffer');
         if (buffer.length > maxBytes)
           throw new Error(`File too large (max ${maxBytes} bytes)`);
-        if (allowedMime.length > 0 && !allowedMime.includes(mime)) {
+        if (!allowedMime.includes(mime)) {
           throw new Error(`Mime not allowed: ${mime}`);
         }
 
