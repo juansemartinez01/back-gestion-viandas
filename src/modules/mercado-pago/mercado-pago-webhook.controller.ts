@@ -31,7 +31,7 @@ export class MercadoPagoWebhookController {
       query.tenant_id ??
       query.tenant ??
       this.configService.get<string>('mercadoPago.webhookTenantId');
-    const queryDataId = query['data.id'] ?? query.data_id;
+    const queryDataId = query['data.id'] ?? query.data_id ?? query.id;
 
     try {
       await this.webhookService.procesarWebhook(

@@ -87,7 +87,9 @@ export class MercadoPagoWebhookService {
 
   private extractDataId(payload: Record<string, any>, queryDataId?: string): string | undefined {
     const resource = typeof payload.resource === 'string' ? payload.resource : '';
-    const resourceId = resource.match(/\/(\d+)(?:\?.*)?$/)?.[1];
+    const resourceId = /^\d+$/.test(resource)
+      ? resource
+      : resource.match(/\/(\d+)(?:\?.*)?$/)?.[1];
     return (
       queryDataId?.toString() ??
       payload.data?.id?.toString() ??
