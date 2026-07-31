@@ -92,8 +92,14 @@ export default () => ({
   // Mercado Pago
   // ==========================
   mercadoPago: {
+    publicKey: process.env.MP_PUBLIC_KEY ?? null,
     accessToken: process.env.MP_ACCESS_TOKEN ?? null,
+    clientId: process.env.MP_CLIENT_ID ?? null,
+    clientSecret: process.env.MP_CLIENT_SECRET ?? null,
     webhookSecret: process.env.MP_WEBHOOK_SECRET ?? null,
+    webhookTenantId:
+      process.env.MP_WEBHOOK_TENANT_ID ?? process.env.SEED_TENANT_ID ?? null,
+    notificationUrl: process.env.MP_NOTIFICATION_URL ?? null,
     successUrl: process.env.MP_SUCCESS_URL ?? null,
     failureUrl: process.env.MP_FAILURE_URL ?? null,
     pendingUrl: process.env.MP_PENDING_URL ?? null,

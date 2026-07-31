@@ -4,7 +4,9 @@ import {
   Headers,
   HttpCode,
   Post,
+  Query,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { ok } from 'src/common/http/api-response';
 import { TenancyService } from 'src/modules/tenancy/tenancy.service';
 import { MercadoPagoWebhookService } from './mercado-pago-webhook.service';
@@ -14,6 +16,7 @@ export class MercadoPagoWebhookController {
   constructor(
     private readonly webhookService: MercadoPagoWebhookService,
     private readonly tenancyService: TenancyService,
+    private readonly configService: ConfigService,
   ) {}
 
   @Post('mercado-pago')
@@ -21,16 +24,22 @@ export class MercadoPagoWebhookController {
   async recibirWebhook(
     @Body() body: Record<string, any>,
     @Headers() headers: Record<string, string | string[] | undefined>,
+    @Query() query: Record<string, string | undefined>,
   ) {
-    let tenantId: string;
-    try {
-      tenantId = this.tenancyService.requireTenantId();
-    } catch {
-      tenantId = 'unknown';
-    }
+    const tenantId =
+      this.tenancyService.getTenantId() ??
+      query.tenant_id ??
+      query.tenant ??
+      this.configService.get<string>('mercadoPago.webhookTenantId');
+    const queryDataId = query['data.id'] ?? query.data_id;
 
     try {
-      await this.webhookService.procesarWebhook(body, headers, tenantId);
+      await this.webhookService.procesarWebhook(
+        body,
+        headers,
+        tenantId ?? '',
+        queryDataId,
+      );
     } catch {
       // Garantía final: nunca propagamos errores al respondedor HTTP
     }

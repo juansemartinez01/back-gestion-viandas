@@ -18,6 +18,9 @@ export class MercadoPagoService {
     descripcion: string,
   ): Promise<PreferenciaResult> {
     const accessToken = this.configService.get<string>('mercadoPago.accessToken');
+    const notificationUrl = this.configService.get<string>(
+      'mercadoPago.notificationUrl',
+    );
     const successUrl = this.configService.get<string>('mercadoPago.successUrl');
     const failureUrl = this.configService.get<string>('mercadoPago.failureUrl');
     const pendingUrl = this.configService.get<string>('mercadoPago.pendingUrl');
@@ -50,6 +53,10 @@ export class MercadoPagoService {
         pending: pendingUrl ?? '',
       },
     };
+
+    if (notificationUrl) {
+      body.notification_url = notificationUrl;
+    }
 
     // auto_return requiere una back_url.success pública (HTTPS). Se omite en desarrollo.
     if (isPublicUrl(successUrl)) {

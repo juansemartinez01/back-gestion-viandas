@@ -506,8 +506,34 @@ export class PedidosService extends BaseCrudTenantService<Pedido> {
     }
 
     pedido.estado_pedido = EstadoPedido.CONFIRMADO_PAGO_ONLINE;
+    pedido.estado_pago = EstadoPagoPedido.APROBADO;
     pedido.expires_at = null;
     pedido.fecha_confirmacion = new Date();
+    await this.pedidoRepo.save(pedido);
+  }
+
+  async rechazarPagoOnline(pedidoId: string, tenantId: string): Promise<void> {
+    const pedido = await this.pedidoRepo
+      .createQueryBuilder('p')
+      .where('p.id = :id', { id: pedidoId })
+      .andWhere('p.tenant_id = :tenantId', { tenantId })
+      .andWhere('p.deleted_at IS NULL')
+      .getOne();
+
+    if (!pedido) {
+      throw new AppError({
+        code: ErrorCodes.PEDIDO_NOT_FOUND,
+        message: 'Pedido no encontrado',
+        status: 404,
+        details: { id: pedidoId },
+      });
+    }
+
+    if (pedido.estado_pedido !== EstadoPedido.PENDIENTE_PAGO_ONLINE) {
+      return;
+    }
+
+    pedido.estado_pago = EstadoPagoPedido.RECHAZADO;
     await this.pedidoRepo.save(pedido);
   }
 }

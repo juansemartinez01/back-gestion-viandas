@@ -109,8 +109,9 @@ export class PagosService {
     pedidoId: string,
     nuevoEstado: EstadoPago,
     referenciaExterna?: string,
+    tenantIdOverride?: string,
   ): Promise<Pago> {
-    const tenantId = this.tenancyService.requireTenantId();
+    const tenantId = tenantIdOverride ?? this.tenancyService.requireTenantId();
     const pago = await this.pagoRepo
       .createQueryBuilder('p')
       .where('p.pedido_id = :pedidoId', { pedidoId })

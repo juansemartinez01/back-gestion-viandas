@@ -27,7 +27,6 @@ export class MercadoPagoWebhookService {
   private validarFirmaHmac(
     dataId: string,
     requestId: string | undefined,
-    ts: string,
     signature: string | undefined,
   ): void {
     const secret = this.configService.get<string>('mercadoPago.webhookSecret');
@@ -42,11 +41,15 @@ export class MercadoPagoWebhookService {
     }
 
     const parts = Object.fromEntries(
-      signature.split(',').map((p) => p.split('=') as [string, string]),
+      signature.split(',').map((p) => {
+        const [key, value] = p.split('=');
+        return [key?.trim(), value?.trim()] as [string, string];
+      }),
     );
+    const ts = parts['ts'];
     const v1 = parts['v1'];
 
-    if (!v1 || !ts) {
+    if (!dataId || !requestId || !ts || !v1) {
       throw new AppError({
         code: ErrorCodes.MERCADO_PAGO_FIRMA_INVALIDA,
         message: 'Formato de firma inválido',
@@ -56,18 +59,24 @@ export class MercadoPagoWebhookService {
 
     const manifest = [
       `id:${dataId}`,
-      requestId ? `request-id:${requestId}` : null,
+      `request-id:${requestId}`,
       `ts:${ts}`,
     ]
       .filter(Boolean)
-      .join(';');
+      .join(';')
+      .concat(';');
 
     const expected = crypto
       .createHmac('sha256', secret)
       .update(manifest)
       .digest('hex');
 
-    if (expected !== v1) {
+    const expectedBuffer = Buffer.from(expected, 'hex');
+    const receivedBuffer = Buffer.from(v1, 'hex');
+    if (
+      expectedBuffer.length !== receivedBuffer.length ||
+      !crypto.timingSafeEqual(expectedBuffer, receivedBuffer)
+    ) {
       throw new AppError({
         code: ErrorCodes.MERCADO_PAGO_FIRMA_INVALIDA,
         message: 'Firma de webhook inválida',
@@ -80,21 +89,17 @@ export class MercadoPagoWebhookService {
     payload: Record<string, any>,
     headers: Record<string, string | string[] | undefined>,
     tenantId: string,
+    queryDataId?: string,
   ): Promise<void> {
     const xSignature = headers['x-signature'] as string | undefined;
     const xRequestId = headers['x-request-id'] as string | undefined;
-    const xTimestamp = headers['x-timestamp'] as string | undefined;
 
     const tipoEvento: string = payload.type ?? payload.action ?? 'desconocido';
-    const dataId: string | undefined = payload.data?.id?.toString();
+    const dataId: string | undefined =
+      queryDataId?.toString() ?? payload.data?.id?.toString();
 
     try {
-      this.validarFirmaHmac(
-        dataId ?? '',
-        xRequestId,
-        xTimestamp ?? '',
-        xSignature,
-      );
+      this.validarFirmaHmac(dataId ?? '', xRequestId, xSignature);
     } catch (err: any) {
       const log = this.logRepo.create({
         tenant_id: tenantId,
@@ -175,7 +180,12 @@ export class MercadoPagoWebhookService {
       throw new Error('Pago aprobado sin external_reference — no se puede identificar el pedido');
     }
 
-    await this.pagosService.actualizarEstadoOnline(pedidoId, EstadoPago.APROBADO, paymentId);
+    await this.pagosService.actualizarEstadoOnline(
+      pedidoId,
+      EstadoPago.APROBADO,
+      paymentId,
+      tenantId,
+    );
     await this.pedidosService.confirmarPagoOnline(pedidoId, tenantId);
     await this.logRepo.update(logId, {
       pedido_id: pedidoId,
@@ -193,7 +203,13 @@ export class MercadoPagoWebhookService {
       throw new Error('Pago rechazado sin external_reference — no se puede identificar el pedido');
     }
 
-    await this.pagosService.actualizarEstadoOnline(pedidoId, EstadoPago.RECHAZADO);
+    await this.pagosService.actualizarEstadoOnline(
+      pedidoId,
+      EstadoPago.RECHAZADO,
+      undefined,
+      tenantId,
+    );
+    await this.pedidosService.rechazarPagoOnline(pedidoId, tenantId);
     await this.logRepo.update(logId, {
       pedido_id: pedidoId,
       resultado_procesamiento: ResultadoProcesamiento.PROCESADO_OK,

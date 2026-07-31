@@ -147,11 +147,31 @@ class EnvVars {
   // ==========================
   @IsOptional()
   @IsString()
+  MP_PUBLIC_KEY?: string;
+
+  @IsOptional()
+  @IsString()
   MP_ACCESS_TOKEN?: string;
 
   @IsOptional()
   @IsString()
+  MP_CLIENT_ID?: string;
+
+  @IsOptional()
+  @IsString()
+  MP_CLIENT_SECRET?: string;
+
+  @IsOptional()
+  @IsString()
   MP_WEBHOOK_SECRET?: string;
+
+  @IsOptional()
+  @IsString()
+  MP_WEBHOOK_TENANT_ID?: string;
+
+  @IsOptional()
+  @IsString()
+  MP_NOTIFICATION_URL?: string;
 
   @IsOptional()
   @IsString()
