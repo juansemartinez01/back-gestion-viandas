@@ -85,6 +85,21 @@ export class MercadoPagoWebhookService {
     }
   }
 
+  private extractDataId(payload: Record<string, any>, queryDataId?: string): string | undefined {
+    const resource = typeof payload.resource === 'string' ? payload.resource : '';
+    const resourceId = resource.match(/\/(\d+)(?:\?.*)?$/)?.[1];
+    return (
+      queryDataId?.toString() ??
+      payload.data?.id?.toString() ??
+      payload.id?.toString() ??
+      resourceId
+    );
+  }
+
+  private extractTipoEvento(payload: Record<string, any>): string {
+    return payload.type ?? payload.topic ?? payload.action ?? 'desconocido';
+  }
+
   async procesarWebhook(
     payload: Record<string, any>,
     headers: Record<string, string | string[] | undefined>,
@@ -94,9 +109,8 @@ export class MercadoPagoWebhookService {
     const xSignature = headers['x-signature'] as string | undefined;
     const xRequestId = headers['x-request-id'] as string | undefined;
 
-    const tipoEvento: string = payload.type ?? payload.action ?? 'desconocido';
-    const dataId: string | undefined =
-      queryDataId?.toString() ?? payload.data?.id?.toString();
+    const tipoEvento = this.extractTipoEvento(payload);
+    const dataId = this.extractDataId(payload, queryDataId);
 
     try {
       this.validarFirmaHmac(dataId ?? '', xRequestId, xSignature);
@@ -126,14 +140,18 @@ export class MercadoPagoWebhookService {
       }),
     );
 
-    if (tipoEvento !== 'payment' || !dataId) return;
+    if (!dataId) return;
 
     try {
-      const paymentData = await this.fetchPayment(dataId);
-      if (paymentData.status === 'approved') {
-        await this.procesarPagoAprobado(dataId, paymentData, tenantId, log.id);
-      } else if (paymentData.status === 'rejected' || paymentData.status === 'cancelled') {
-        await this.procesarPagoRechazado(paymentData, tenantId, log.id);
+      if (tipoEvento === 'payment') {
+        const paymentData = await this.fetchPayment(dataId);
+        if (paymentData.status === 'approved') {
+          await this.procesarPagoAprobado(dataId, paymentData, tenantId, log.id);
+        } else if (paymentData.status === 'rejected' || paymentData.status === 'cancelled') {
+          await this.procesarPagoRechazado(paymentData, tenantId, log.id);
+        }
+      } else if (tipoEvento === 'merchant_order') {
+        await this.procesarMerchantOrder(payload, dataId, tenantId, log.id);
       }
     } catch (err: any) {
       await this.logRepo.update(log.id, {
@@ -167,6 +185,90 @@ export class MercadoPagoWebhookService {
     }
 
     return response.json() as Promise<Record<string, any>>;
+  }
+
+  private async fetchMerchantOrder(
+    payload: Record<string, any>,
+    merchantOrderId: string,
+  ): Promise<Record<string, any>> {
+    const accessToken = this.configService.get<string>('mercadoPago.accessToken');
+    if (!accessToken) {
+      throw new AppError({
+        code: ErrorCodes.MERCADO_PAGO_ERROR_PREFERENCIA,
+        message: 'MP_ACCESS_TOKEN no configurado',
+        status: 502,
+      });
+    }
+
+    const resource =
+      typeof payload.resource === 'string' &&
+      payload.resource.startsWith('https://api.mercadolibre.com/merchant_orders/')
+        ? payload.resource
+        : `https://api.mercadolibre.com/merchant_orders/${merchantOrderId}`;
+
+    let response: Response;
+    try {
+      response = await fetch(resource, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+    } catch (err: any) {
+      throw new Error(`Error consultando merchant order en MP: ${err?.message}`);
+    }
+
+    if (!response.ok) {
+      throw new Error(
+        `MP devolvió HTTP ${response.status} al consultar merchant order ${merchantOrderId}`,
+      );
+    }
+
+    return response.json() as Promise<Record<string, any>>;
+  }
+
+  private async procesarMerchantOrder(
+    payload: Record<string, any>,
+    merchantOrderId: string,
+    tenantId: string,
+    logId: string,
+  ): Promise<void> {
+    const merchantOrder = await this.fetchMerchantOrder(payload, merchantOrderId);
+    const payments = Array.isArray(merchantOrder.payments)
+      ? merchantOrder.payments
+      : [];
+
+    const approved = payments.find((p) => p.status === 'approved');
+    if (approved?.id) {
+      await this.procesarPagoAprobado(
+        approved.id.toString(),
+        {
+          ...approved,
+          external_reference: merchantOrder.external_reference,
+        },
+        tenantId,
+        logId,
+      );
+      return;
+    }
+
+    const rejected = payments.find(
+      (p) => p.status === 'rejected' || p.status === 'cancelled',
+    );
+    if (rejected?.id) {
+      await this.procesarPagoRechazado(
+        {
+          ...rejected,
+          external_reference: merchantOrder.external_reference,
+        },
+        tenantId,
+        logId,
+      );
+      return;
+    }
+
+    await this.logRepo.update(logId, {
+      pedido_id: merchantOrder.external_reference ?? null,
+      resultado_procesamiento: ResultadoProcesamiento.PENDIENTE_REVISION,
+      mensaje_error: null,
+    });
   }
 
   private async procesarPagoAprobado(
