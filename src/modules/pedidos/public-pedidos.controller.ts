@@ -29,6 +29,12 @@ export class PublicPedidosController {
     return ok(pedidos);
   }
 
+  @Get(':id/estado')
+  async estado(@Param('id') id: string, @Query('dni') dni: string) {
+    const estado = await this.svc.consultarEstadoPublico(id, dni);
+    return ok(estado);
+  }
+
   @Post(':id/cancelar')
   async cancelar(
     @Param('id') id: string,

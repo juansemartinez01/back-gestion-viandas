@@ -32,14 +32,14 @@ export class SedesController {
     private readonly audit: AuditService,
   ) {}
 
-  @Roles('Admin')
+  @Roles('Admin', 'Cocina')
   @Get()
   async list(@Query() query: QuerySedeDto) {
     const { items, total } = await this.svc.list(query);
     return page(items, query.page ?? 1, query.limit ?? 20, total);
   }
 
-  @Roles('Admin')
+  @Roles('Admin', 'Cocina')
   @Get(':id')
   async findOne(@Param('id') id: string) {
     const sede = await this.svc.findOne(id);

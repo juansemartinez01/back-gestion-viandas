@@ -32,14 +32,14 @@ export class MenusBaseController {
     private readonly audit: AuditService,
   ) {}
 
-  @Roles('Admin')
+  @Roles('Admin', 'Cocina')
   @Get()
   async list(@Query() query: QueryMenuBaseDto) {
     const result = await this.svc.list(query);
     return page(result.items, result.page, result.limit, result.total);
   }
 
-  @Roles('Admin')
+  @Roles('Admin', 'Cocina')
   @Get(':id')
   async findOne(@Param('id') id: string) {
     const menu = await this.svc.findOne(id);

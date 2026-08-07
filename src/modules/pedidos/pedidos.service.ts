@@ -289,6 +289,48 @@ export class PedidosService extends BaseCrudTenantService<Pedido> {
       .getMany();
   }
 
+  async consultarEstadoPublico(id: string, dni: string) {
+    const tenantId = this.getTenantId({ strictTenant: true });
+    const dniNormalizado = String(dni ?? '').trim();
+
+    if (!dniNormalizado) {
+      throw new AppError({
+        code: ErrorCodes.BAD_REQUEST,
+        message: 'El DNI es obligatorio',
+        status: 400,
+      });
+    }
+
+    const pedido = await this.pedidoRepo
+      .createQueryBuilder('p')
+      .where('p.id = :id', { id })
+      .andWhere('p.tenant_id = :tenantId', { tenantId })
+      .andWhere('p.dni_informado ILIKE :dni', { dni: dniNormalizado })
+      .andWhere('p.deleted_at IS NULL')
+      .getOne();
+
+    if (!pedido) {
+      throw new AppError({
+        code: ErrorCodes.PEDIDO_NOT_FOUND,
+        message: 'Pedido no encontrado',
+        status: 404,
+        details: { id },
+      });
+    }
+
+    return {
+      id: pedido.id,
+      codigo_publico: pedido.codigo_publico,
+      medio_pago: pedido.medio_pago,
+      estado_pedido: pedido.estado_pedido,
+      estado_pago: pedido.estado_pago,
+      mp_preference_id: pedido.mp_preference_id,
+      fecha_confirmacion: pedido.fecha_confirmacion,
+      fecha_cancelacion: pedido.fecha_cancelacion,
+      expires_at: pedido.expires_at,
+    };
+  }
+
   async findOne(id: string): Promise<Pedido> {
     const tenantId = this.getTenantId({ strictTenant: true });
     const pedido = await this.pedidoRepo
