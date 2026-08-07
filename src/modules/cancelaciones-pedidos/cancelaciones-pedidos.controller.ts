@@ -12,21 +12,21 @@ import { ResumenCancelacionesDto } from './dto/resumen-cancelaciones.dto';
 export class CancelacionesPedidosController {
   constructor(private readonly svc: CancelacionesPedidosService) {}
 
-  @Roles('administrador', 'supervisor')
+  @Roles('Admin')
   @Get()
   async list(@Query() query: QueryCancelacionesDto) {
     const result = await this.svc.list(query);
     return page(result.items, result.page, result.limit, result.total);
   }
 
-  @Roles('administrador')
+  @Roles('Admin')
   @Get('devolucion-pendiente')
   async listDevolucionPendiente() {
     const data = await this.svc.listDevolucionPendiente();
     return ok(data);
   }
 
-  @Roles('administrador', 'supervisor')
+  @Roles('Admin')
   @Get('resumen')
   async resumen(@Query() query: ResumenCancelacionesDto) {
     const resumen = await this.svc.resumenDia(query);

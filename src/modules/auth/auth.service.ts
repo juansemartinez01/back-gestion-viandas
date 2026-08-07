@@ -99,7 +99,7 @@ export class AuthService {
       tenant_id: tenantId,
       email,
       password_hash: hash,
-      roleNames: ['user'],
+      roleNames: [],
     });
 
     return {

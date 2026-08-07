@@ -17,5 +17,5 @@ export class CreateUserAdminDto {
   @IsOptional()
   @IsArray()
   @IsString({ each: true })
-  roles?: string[]; // ['admin','user']
+  roles?: string[]; // ['Admin','Vendedor','Cocina']
 }

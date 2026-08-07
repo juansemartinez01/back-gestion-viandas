@@ -20,8 +20,9 @@ import { UpdateRoleAdminDto } from './dto/update-role.admin.dto';
 import { PinoLogger } from 'nestjs-pino';
 import { auditLogPayload } from 'src/common/audit/audit.util';
 import { AuditService } from '../audit/audit.service';
+import { RoleSyncService } from './role-sync.service';
 
-@Roles('admin', 'administrador')
+@Roles('Admin')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('admin/roles')
 export class AdminRolesController {
@@ -29,6 +30,7 @@ export class AdminRolesController {
     private readonly users: UsersService,
     private readonly logger: PinoLogger,
     private readonly audit: AuditService,
+    private readonly roleSync: RoleSyncService,
   ) {}
 
   @Get()
@@ -65,7 +67,8 @@ export class AdminRolesController {
       payload: auditPayload,
     });
 
-    return { ok: true, item: { id: r.id, name: r.name } };
+    const sync = await this.roleSync.syncRoleName(r.name);
+    return { ok: true, item: { id: r.id, name: r.name }, sync };
   }
 
   @Patch(':id')
@@ -131,7 +134,8 @@ export class AdminRolesController {
       payload: auditPayload,
     });
 
-    return { ok: true };
+    const sync = await this.roleSync.syncRoleName(r.name);
+    return { ok: true, sync };
   }
 
   @Delete(':id')

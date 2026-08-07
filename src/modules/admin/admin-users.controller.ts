@@ -25,7 +25,7 @@ import { PinoLogger } from 'nestjs-pino';
 import { auditLogPayload } from 'src/common/audit/audit.util';
 import { AuditService } from '../audit/audit.service';
 
-@Roles('admin', 'administrador')
+@Roles('Admin')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('admin/users')
 export class AdminUsersController {

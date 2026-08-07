@@ -26,20 +26,20 @@ export class ClientesController {
     private readonly audit: AuditService,
   ) {}
 
-  @Roles('administrador', 'supervisor')
+  @Roles('Admin')
   @Get()
   async list(@Query() query: QueryClienteDto) {
     const { items, total } = await this.svc.list(query);
     return page(items, query.page ?? 1, query.limit ?? 20, total);
   }
 
-  @Roles('administrador', 'supervisor')
+  @Roles('Admin')
   @Get(':id')
   async findOne(@Param('id') id: string) {
     return ok(await this.svc.findOne(id));
   }
 
-  @Roles('administrador')
+  @Roles('Admin')
   @Patch(':id/bloquear')
   async bloquear(@Req() req: any, @Param('id') id: string) {
     const cl = await this.svc.bloquear(id);
@@ -68,7 +68,7 @@ export class ClientesController {
     return ok(cl);
   }
 
-  @Roles('administrador')
+  @Roles('Admin')
   @Patch(':id/desbloquear')
   async desbloquear(@Req() req: any, @Param('id') id: string) {
     const cl = await this.svc.desbloquear(id);

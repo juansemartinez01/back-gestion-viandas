@@ -8,6 +8,7 @@ import { QueryUsersAdminDto } from '../admin/dto/query-users.admin.dto';
 import { ConfigService } from '@nestjs/config';
 import { TenancyService } from '../tenancy/tenancy.service';
 import { requireTenantId } from 'src/common/tenancy/tenant-query.util';
+import { APP_ROLES, canonicalizeRoleName } from '../auth/roles.constants';
 
 @Injectable()
 export class UsersService {
@@ -52,7 +53,8 @@ export class UsersService {
 
   // ✅ Roles GLOBAL: tenant_id IS NULL
   async getOrCreateRole(name: string): Promise<Role> {
-    const key = name.toLowerCase().trim();
+    const key = canonicalizeRoleName(name);
+    if (!key) throw new BadRequestException('Role name is required');
 
     const existing = await this.rolesRepo.findOne({
       where: { name: key, tenant_id: IsNull() },
@@ -79,9 +81,10 @@ export class UsersService {
     const exists = await this.findByEmail(email);
     if (exists) throw new BadRequestException('Email already exists');
 
-    const roles = params.roleNames?.length
-      ? await Promise.all(params.roleNames.map((r) => this.getOrCreateRole(r)))
-      : [await this.getOrCreateRole('user')];
+    const roleNames = params.roleNames ?? [];
+    const roles = roleNames.length
+      ? await Promise.all(roleNames.map((r) => this.getOrCreateRole(r)))
+      : [];
 
     const user = this.usersRepo.create({
       tenant_id: params.tenant_id,
@@ -164,7 +167,7 @@ export class UsersService {
       tenant_id: tenantId,
       email: params.email,
       password_hash,
-      roleNames: params.roles?.length ? params.roles : ['user'],
+      roleNames: params.roles ?? [],
     });
   }
 
@@ -227,12 +230,14 @@ export class UsersService {
     });
     if (!user) return null;
 
-    const normalized = roleNames.map((r) => r.toLowerCase().trim());
+    const normalized = Array.from(
+      new Set(roleNames.map((r) => canonicalizeRoleName(r))),
+    );
 
-    // 🔒 si es seed admin, forzamos que siempre tenga 'admin'
+    // 🔒 si es seed admin, forzamos que siempre tenga rol Admin
     const isSeedAdmin = await this.isSeedAdminUserId(userId);
-    if (isSeedAdmin && !normalized.includes('admin')) {
-      normalized.push('admin');
+    if (isSeedAdmin && !normalized.includes(APP_ROLES.ADMIN)) {
+      normalized.push(APP_ROLES.ADMIN);
     }
 
     const roles = await Promise.all(
@@ -263,7 +268,7 @@ export class UsersService {
     });
     if (!role) return null;
 
-    role.name = name.toLowerCase().trim();
+    role.name = canonicalizeRoleName(name);
     return this.rolesRepo.save(role);
   }
 
@@ -274,7 +279,7 @@ export class UsersService {
     });
     if (!role) return false;
 
-    if (role.name === 'admin') return false;
+    if (canonicalizeRoleName(role.name) === APP_ROLES.ADMIN) return false;
 
     const res = await this.rolesRepo.delete({ id, tenant_id: IsNull() } as any);
     return !!res.affected;

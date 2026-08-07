@@ -30,21 +30,21 @@ export class PedidosController {
     private readonly audit: AuditService,
   ) {}
 
-  @Roles('administrador', 'supervisor', 'operador_caja', 'vendedor')
+  @Roles('Admin', 'Vendedor')
   @Get()
   async list(@Query() query: QueryPedidoDto) {
     const result = await this.svc.list(query);
     return page(result.items, result.page, result.limit, result.total);
   }
 
-  @Roles('administrador', 'supervisor', 'operador_caja', 'vendedor')
+  @Roles('Admin', 'Vendedor')
   @Get(':id')
   async findOne(@Param('id') id: string) {
     const pedido = await this.svc.findOne(id);
     return ok(pedido);
   }
 
-  @Roles('administrador', 'supervisor')
+  @Roles('Admin')
   @Post('manual')
   @HttpCode(201)
   async crearManual(@Req() req: any, @Body() dto: CreatePedidoManualDto) {
@@ -77,7 +77,7 @@ export class PedidosController {
     return ok(pedido);
   }
 
-  @Roles('administrador')
+  @Roles('Admin')
   @Patch(':id')
   async update(
     @Req() req: any,
@@ -109,7 +109,7 @@ export class PedidosController {
     return ok(pedido);
   }
 
-  @Roles('administrador', 'supervisor', 'operador_caja', 'vendedor')
+  @Roles('Admin', 'Vendedor')
   @Post(':id/cancelar')
   async cancelar(
     @Req() req: any,

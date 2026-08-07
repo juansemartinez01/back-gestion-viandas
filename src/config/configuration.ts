@@ -105,6 +105,12 @@ export default () => ({
     pendingUrl: process.env.MP_PENDING_URL ?? null,
   },
 
+  rolesSync: {
+    peerUrl: process.env.ROLE_SYNC_PEER_URL ?? null,
+    secret: process.env.ROLE_SYNC_SECRET ?? null,
+    tenantId: process.env.ROLE_SYNC_TENANT_ID ?? null,
+  },
+
   // ==========================
   // Files
   // ==========================

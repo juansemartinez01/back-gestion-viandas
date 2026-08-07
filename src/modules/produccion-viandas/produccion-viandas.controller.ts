@@ -29,7 +29,7 @@ export class ProduccionViandasController {
     private readonly audit: AuditService,
   ) {}
 
-  @Roles('administrador', 'supervisor', 'cocina')
+  @Roles('Admin', 'Cocina')
   @Get()
   async list(@Query() query: QueryProduccionDto) {
     const result = await this.svc.list(query);
@@ -37,7 +37,7 @@ export class ProduccionViandasController {
   }
 
   // IMPORTANTE: /imprimible debe declararse ANTES de /:id
-  @Roles('administrador', 'supervisor', 'cocina')
+  @Roles('Admin', 'Cocina')
   @Get('imprimible')
   async imprimible(@Query() query: QueryProduccionDto) {
     const data = await this.svc.getImprimible(query);
@@ -45,7 +45,7 @@ export class ProduccionViandasController {
   }
 
   // IMPORTANTE: /generar debe declararse ANTES de /:id
-  @Roles('administrador', 'supervisor')
+  @Roles('Admin', 'Cocina')
   @Post('generar')
   @HttpCode(200)
   async generar(@Req() req: any, @Body() dto: GenerarProduccionDto) {
@@ -79,14 +79,14 @@ export class ProduccionViandasController {
     return ok(ordenes);
   }
 
-  @Roles('administrador', 'supervisor', 'cocina')
+  @Roles('Admin', 'Cocina')
   @Get(':id')
   async findOne(@Param('id') id: string) {
     const orden = await this.svc.findOrdenById(id);
     return ok(orden);
   }
 
-  @Roles('administrador', 'supervisor')
+  @Roles('Admin', 'Cocina')
   @Patch(':id/en-produccion')
   async enProduccion(@Req() req: any, @Param('id') id: string) {
     const orden = await this.svc.marcarEnProduccion(id);
@@ -115,7 +115,7 @@ export class ProduccionViandasController {
     return ok(orden);
   }
 
-  @Roles('administrador', 'supervisor')
+  @Roles('Admin', 'Cocina')
   @Post(':id/confirmar')
   @HttpCode(200)
   async confirmar(

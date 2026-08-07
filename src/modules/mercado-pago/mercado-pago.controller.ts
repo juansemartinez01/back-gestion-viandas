@@ -27,7 +27,7 @@ export class MercadoPagoController {
     private readonly tenancyService: TenancyService,
   ) {}
 
-  @Roles('admin', 'administrador')
+  @Roles('Admin')
   @Get('logs')
   async listarLogs(@Query() query: QueryWebhookLogDto) {
     const tenantId = this.tenancyService.requireTenantId();
@@ -62,7 +62,7 @@ export class MercadoPagoController {
     return page(items, currentPage, limit, total);
   }
 
-  @Roles('admin', 'administrador')
+  @Roles('Admin')
   @Get('logs/:id')
   async obtenerLog(@Param('id') id: string) {
     const tenantId = this.tenancyService.requireTenantId();

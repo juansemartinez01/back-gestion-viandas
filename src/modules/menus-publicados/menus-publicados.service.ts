@@ -18,6 +18,7 @@ import { CreateMenuPublicadoDto } from './dto/create-menu-publicado.dto';
 import { UpdateMenuPublicadoDto } from './dto/update-menu-publicado.dto';
 import { QueryMenuPublicadoDto } from './dto/query-menu-publicado.dto';
 import { QueryMenusDisponiblesDto } from './dto/query-menus-disponibles.dto';
+import { APP_ROLES, canonicalizeRoleName } from '../auth/roles.constants';
 
 const DIAS_HORIZONTE_PUBLICO = 7;
 
@@ -275,7 +276,8 @@ export class MenusPublicadosService extends BaseCrudTenantService<MenuPublicado>
     }
 
     const soloAdmin = [EstadoMenuPublicado.CERRADO, EstadoMenuPublicado.AGOTADO];
-    if (soloAdmin.includes(mp.estado) && !roles.includes('administrador')) {
+    const userRoles = roles.map((role) => canonicalizeRoleName(role));
+    if (soloAdmin.includes(mp.estado) && !userRoles.includes(APP_ROLES.ADMIN)) {
       throw new AppError({
         code: ErrorCodes.MENU_PUBLICADO_TRANSICION_INVALIDA,
         message: `Solo un administrador puede cancelar un menú en estado "${mp.estado}"`,

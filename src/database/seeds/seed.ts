@@ -6,6 +6,7 @@ import { AppModule } from '../../app.module';
 import { UsersService } from '../../modules/users/users.service';
 import { ConfigService } from '@nestjs/config';
 import { tenantContext } from '../../modules/tenancy/tenant-context';
+import { APP_ROLES } from '../../modules/auth/roles.constants';
 
 async function bootstrap() {
   const app = await NestFactory.createApplicationContext(AppModule, {
@@ -37,7 +38,7 @@ async function bootstrap() {
           tenant_id: seedTenantId,
           email: adminEmail,
           password_hash,
-          roleNames: ['admin'],
+          roleNames: [APP_ROLES.ADMIN],
         });
         console.log('✅ [seed1] Admin creado:', admin.email, '| roles:', admin.roles.map((r) => r.name));
       }
@@ -56,7 +57,7 @@ async function bootstrap() {
         tenant_id: seedTenantId,
         email: rochesterEmail,
         password_hash,
-        roleNames: ['administrador'],
+        roleNames: [APP_ROLES.ADMIN],
       });
       console.log(
         '✅ [seed2] Rochester admin creado:',

@@ -5,7 +5,7 @@ import { Roles } from '../auth/decorators/roles.decorator';
 import { AuditService } from './audit.service';
 import { QueryAuditLogsDto } from './dto/query-audit-logs.dto';
 
-@Roles('admin', 'administrador')
+@Roles('Admin')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('admin/audit-logs')
 export class AdminAuditController {

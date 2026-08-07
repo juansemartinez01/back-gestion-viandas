@@ -32,21 +32,21 @@ export class BannersPromocionesController {
     private readonly audit: AuditService,
   ) {}
 
-  @Roles('administrador', 'supervisor')
+  @Roles('Admin')
   @Get()
   async list(@Query() query: QueryBannerDto) {
     const { items, total } = await this.svc.list(query);
     return page(items, query.page ?? 1, query.limit ?? 20, total);
   }
 
-  @Roles('administrador', 'supervisor')
+  @Roles('Admin')
   @Get(':id')
   async findOne(@Param('id') id: string) {
     const banner = await this.svc.findOne(id);
     return ok(banner);
   }
 
-  @Roles('administrador')
+  @Roles('Admin')
   @Post()
   @HttpCode(201)
   async create(@Req() req: any, @Body() dto: CreateBannerDto) {
@@ -76,7 +76,7 @@ export class BannersPromocionesController {
     return ok(banner);
   }
 
-  @Roles('administrador')
+  @Roles('Admin')
   @Patch(':id')
   async update(@Req() req: any, @Param('id') id: string, @Body() dto: UpdateBannerDto) {
     const banner = await this.svc.update(id, dto);
@@ -105,7 +105,7 @@ export class BannersPromocionesController {
     return ok(banner);
   }
 
-  @Roles('administrador')
+  @Roles('Admin')
   @Patch(':id/activar')
   async activar(@Req() req: any, @Param('id') id: string) {
     const banner = await this.svc.activar(id);
@@ -134,7 +134,7 @@ export class BannersPromocionesController {
     return ok(banner);
   }
 
-  @Roles('administrador')
+  @Roles('Admin')
   @Patch(':id/inactivar')
   async inactivar(@Req() req: any, @Param('id') id: string) {
     const banner = await this.svc.inactivar(id);
@@ -163,7 +163,7 @@ export class BannersPromocionesController {
     return ok(banner);
   }
 
-  @Roles('administrador')
+  @Roles('Admin')
   @Delete(':id')
   async remove(@Req() req: any, @Param('id') id: string) {
     await this.svc.remove(id);

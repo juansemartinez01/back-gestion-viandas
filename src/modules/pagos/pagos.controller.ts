@@ -10,7 +10,7 @@ import { PagosService } from './pagos.service';
 export class PagosController {
   constructor(private readonly svc: PagosService) {}
 
-  @Roles('administrador', 'supervisor', 'operador_caja', 'vendedor')
+  @Roles('Admin', 'Vendedor')
   @Get(':pedidoId')
   async findByPedidoId(@Param('pedidoId') pedidoId: string) {
     const pago = await this.svc.findByPedidoId(pedidoId);

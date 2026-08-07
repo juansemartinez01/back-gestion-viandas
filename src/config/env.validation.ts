@@ -186,6 +186,21 @@ class EnvVars {
   MP_PENDING_URL?: string;
 
   // ==========================
+  // Role synchronization
+  // ==========================
+  @IsOptional()
+  @IsString()
+  ROLE_SYNC_PEER_URL?: string;
+
+  @IsOptional()
+  @IsString()
+  ROLE_SYNC_SECRET?: string;
+
+  @IsOptional()
+  @IsString()
+  ROLE_SYNC_TENANT_ID?: string;
+
+  // ==========================
   // Observability
   // ==========================
   @IsOptional()

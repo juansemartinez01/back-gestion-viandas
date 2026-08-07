@@ -32,21 +32,21 @@ export class MenusPublicadosController {
     private readonly audit: AuditService,
   ) {}
 
-  @Roles('administrador', 'supervisor')
+  @Roles('Admin')
   @Get()
   async list(@Query() query: QueryMenuPublicadoDto) {
     const result = await this.svc.list(query);
     return page(result.items, result.page, result.limit, result.total);
   }
 
-  @Roles('administrador', 'supervisor')
+  @Roles('Admin')
   @Get(':id')
   async findOne(@Param('id') id: string) {
     const mp = await this.svc.findOne(id);
     return ok(mp);
   }
 
-  @Roles('administrador', 'supervisor')
+  @Roles('Admin')
   @Post()
   @HttpCode(201)
   async create(@Req() req: any, @Body() dto: CreateMenuPublicadoDto) {
@@ -76,7 +76,7 @@ export class MenusPublicadosController {
     return ok(mp);
   }
 
-  @Roles('administrador')
+  @Roles('Admin')
   @Patch(':id')
   async update(@Req() req: any, @Param('id') id: string, @Body() dto: UpdateMenuPublicadoDto) {
     const mp = await this.svc.editarMenuPublicado(id, dto);
@@ -105,7 +105,7 @@ export class MenusPublicadosController {
     return ok(mp);
   }
 
-  @Roles('administrador', 'supervisor')
+  @Roles('Admin')
   @Patch(':id/pausar')
   async pausar(@Req() req: any, @Param('id') id: string) {
     const mp = await this.svc.pausar(id);
@@ -134,7 +134,7 @@ export class MenusPublicadosController {
     return ok(mp);
   }
 
-  @Roles('administrador', 'supervisor')
+  @Roles('Admin')
   @Patch(':id/reactivar')
   async reactivar(@Req() req: any, @Param('id') id: string) {
     const mp = await this.svc.reactivar(id);
@@ -163,7 +163,7 @@ export class MenusPublicadosController {
     return ok(mp);
   }
 
-  @Roles('administrador', 'supervisor')
+  @Roles('Admin')
   @Patch(':id/cerrar')
   async cerrar(@Req() req: any, @Param('id') id: string) {
     const mp = await this.svc.cerrar(id);
@@ -192,7 +192,7 @@ export class MenusPublicadosController {
     return ok(mp);
   }
 
-  @Roles('administrador', 'supervisor')
+  @Roles('Admin')
   @Patch(':id/agotar')
   async agotar(@Req() req: any, @Param('id') id: string) {
     const mp = await this.svc.agotar(id);
@@ -221,7 +221,7 @@ export class MenusPublicadosController {
     return ok(mp);
   }
 
-  @Roles('administrador', 'supervisor')
+  @Roles('Admin')
   @Patch(':id/cancelar')
   async cancelar(@Req() req: any, @Param('id') id: string) {
     const roles: string[] = Array.isArray(req.user?.roles) ? req.user.roles : [];
@@ -251,7 +251,7 @@ export class MenusPublicadosController {
     return ok(mp);
   }
 
-  @Roles('administrador')
+  @Roles('Admin')
   @Delete(':id')
   async remove(@Req() req: any, @Param('id') id: string) {
     await this.svc.remove(id);
