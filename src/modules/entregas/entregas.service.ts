@@ -9,7 +9,10 @@ import { TenancyService } from 'src/modules/tenancy/tenancy.service';
 import { StockViandasService } from 'src/modules/stock-viandas/stock-viandas.service';
 import { CierresOperativosService } from 'src/modules/cierres-operativos/cierres-operativos.service';
 import { Pedido } from 'src/modules/pedidos/entities/pedido.entity';
-import { EstadoPedido, MedioPagoPedido } from 'src/modules/pedidos/pedido.enums';
+import {
+  EstadoPedido,
+  MedioPagoPedido,
+} from 'src/modules/pedidos/pedido.enums';
 import { StockVianda } from 'src/modules/stock-viandas/entities/stock-vianda.entity';
 import { Pago } from 'src/modules/pagos/entities/pago.entity';
 import { EstadoPago } from 'src/modules/pagos/pago.enums';
@@ -88,7 +91,10 @@ export class EntregasService {
           code: ErrorCodes.CIERRE_DIA_CERRADO,
           message: 'El día operativo ya fue cerrado para este punto de retiro',
           status: 409,
-          details: { fecha: pedido.fecha_retiro, punto_retiro_id: pedido.punto_retiro_id },
+          details: {
+            fecha: pedido.fecha_retiro,
+            punto_retiro_id: pedido.punto_retiro_id,
+          },
         });
       }
 
@@ -152,7 +158,8 @@ export class EntregasService {
         if (pago.estado !== EstadoPago.PRESENCIAL_PENDIENTE) {
           throw new AppError({
             code: ErrorCodes.PAGO_YA_COBRADO,
-            message: 'El pago ya fue cobrado o no está en estado de cobro pendiente',
+            message:
+              'El pago ya fue cobrado o no está en estado de cobro pendiente',
             status: 409,
             details: { pedido_id: pedido.id, estado_pago: pago.estado },
           });
@@ -178,7 +185,9 @@ export class EntregasService {
         fecha_entrega: new Date(),
         observacion: dto.observacion ?? null,
       });
-      const savedEntrega = await qr.manager.getRepository(EntregaPedido).save(entrega);
+      const savedEntrega = await qr.manager
+        .getRepository(EntregaPedido)
+        .save(entrega);
 
       await this.auditService.write('admin', {
         actor_user_id: usuarioId,
@@ -210,13 +219,25 @@ export class EntregasService {
 
   async buscarPorDni(query: BuscarPorDniDto): Promise<Pedido[]> {
     const tenantId = this.tenancyService.requireTenantId();
+    const dniDigits = query.dni.replace(/\D/g, '');
+
+    if (dniDigits.length < 3) {
+      throw new AppError({
+        code: ErrorCodes.BAD_REQUEST,
+        message: 'Ingresá al menos 3 números del DNI para buscar pedidos',
+        status: 400,
+        details: { min_digits: 3 },
+      });
+    }
 
     const qb = this.pedidoRepo
       .createQueryBuilder('p')
       .leftJoinAndSelect('p.menuPublicado', 'mp')
       .leftJoinAndSelect('mp.menuBase', 'mb')
       .where('p.tenant_id = :tenantId', { tenantId })
-      .andWhere('p.dni_informado ILIKE :dni', { dni: query.dni })
+      .andWhere("regexp_replace(p.dni_informado, '\\D', '', 'g') LIKE :dni", {
+        dni: `%${dniDigits}%`,
+      })
       .andWhere('p.estado_pedido IN (:...estados)', {
         estados: [
           EstadoPedido.CONFIRMADO_PAGO_ONLINE,

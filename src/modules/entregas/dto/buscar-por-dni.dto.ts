@@ -1,8 +1,16 @@
-import { IsDateString, IsNotEmpty, IsOptional, IsString, IsUUID } from 'class-validator';
+import {
+  IsDateString,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsUUID,
+  MaxLength,
+} from 'class-validator';
 
 export class BuscarPorDniDto {
   @IsString()
   @IsNotEmpty()
+  @MaxLength(20)
   dni!: string;
 
   @IsDateString()

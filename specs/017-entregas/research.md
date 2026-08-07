@@ -19,6 +19,7 @@
 **Rationale**: `PagosService.registrarCobroPresencial(pedidoId)` firma actual: `(pedidoId: string): Promise<Pago>`. No acepta QueryRunner ni EntityManager. Usa `this.pagoRepo.save(pago)` que opera en una conexión del pool, fuera de la transacción del QueryRunner. Para mantener atomicidad total (EntregaPedido + actualización Pago + estado Pedido en el mismo rollback scope), la actualización del pago debe ocurrir via `qr.manager`.
 
 **Implementation**: Dentro de la transacción:
+
 ```
 const pago = await qr.manager.getRepository(Pago)
   .createQueryBuilder('p')
@@ -61,6 +62,7 @@ importe_cobrado_caja = pago.importe;
 **Rationale**: Evita que dos requests simultáneos para el mismo pedido pasen la verificación de idempotencia al mismo tiempo. Primero se bloquea el registro del pedido, luego se lee su estado. El orden es: LOCK → validar estado → verificar idempotencia → consumir stock → crear entrega.
 
 **Implementation**:
+
 ```
 const pedido = await qr.manager
   .getRepository(Pedido)
@@ -85,11 +87,11 @@ const pedido = await qr.manager
 
 ---
 
-## Decision 6: BuscarPorDni — campo dni_informado con ILIKE
+## Decision 6: BuscarPorDni — secuencia parcial de DNI normalizado
 
-**Decision**: La búsqueda por DNI usa `pedido.dni_informado ILIKE :dni` para ser case-insensitive y tolerante a formatos mixtos.
+**Decision**: La búsqueda por DNI normaliza la entrada a dígitos, exige al menos 3 números, y busca esa secuencia dentro de `pedido.dni_informado` también normalizado.
 
-**Rationale**: El campo `dni_informado` en Pedido es `varchar(20)`. El DNI puede ingresarse con variaciones de formato (espacios, puntos). ILIKE garantiza que `12345678` y `12.345.678` no son iguales pero tampoco sensibles a mayúsculas. El operador puede buscar con coincidencia exacta o parcial.
+**Rationale**: La pantalla de caja necesita encontrar pedidos con pocos dígitos para agilizar la atención, pero no conviene permitir 1 o 2 dígitos porque devuelve demasiadas coincidencias. Normalizar ambos lados permite que `412`, `41.2` o `412` funcionen igual aunque el DNI haya quedado guardado con puntos o espacios.
 
 **Filtering**: La búsqueda siempre requiere `fecha` + `sede_id`. `punto_retiro_id` es opcional — si viene, se filtra; si no, muestra todos los puntos de la sede para ese día.
 
@@ -124,14 +126,17 @@ const pedido = await qr.manager
 ## Interfaces de servicios dependientes confirmadas
 
 ### PagosService
+
 - `registrarCobroPresencial(pedidoId: string): Promise<Pago>` — NO usar; replicar inline via qr.manager
 - `crearPagoPresencial(pedidoId, importe, tenantId, qr)` — no aplica aquí (el pago ya existe)
 
 ### StockViandasService
+
 - `consumirParaEntrega(stockViandaId: string, cantidad: number, pedidoId: string, tenantId: string): Promise<void>` — llamar con los 4 args
 - Maneja `STOCK_INSUFICIENTE_ENTREGAS` (409) internamente — no re-catchear en EntregasService
 
 ### Pedido entity campos relevantes
+
 - `fecha_retiro: string` (date) — usar para lookup de stock
 - `medio_pago: MedioPagoPedido` (MERCADO_PAGO | PRESENCIAL) — ramifica el flujo de cobro
 - `estado_pedido: EstadoPedido` — estados elegibles: CONFIRMADO_PAGO_ONLINE, CONFIRMADO_PAGO_PRESENCIAL
@@ -140,11 +145,13 @@ const pedido = await qr.manager
 - `sede_id`, `punto_retiro_id`, `menu_publicado_id` — para lookup de stock
 
 ### ErrorCodes existentes (no duplicar)
+
 - `STOCK_INSUFICIENTE_ENTREGAS` — lanzado por `consumirParaEntrega`, no crear uno nuevo
 - `PAGO_NOT_FOUND` — reutilizar si el pago presencial no existe
 - `PEDIDO_NOT_FOUND` — reutilizar si el pedido no existe
 
 ### ErrorCodes nuevos a agregar
+
 - `ENTREGA_PEDIDO_NO_ENTREGABLE` (409) — pedido en estado inválido para entrega
 - `ENTREGA_YA_REGISTRADA` (409) — ya existe EntregaPedido para este pedido
 - `ENTREGA_NOT_FOUND` (404) — entrega no encontrada por id

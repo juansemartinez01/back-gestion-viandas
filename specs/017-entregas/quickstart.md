@@ -5,6 +5,7 @@
 ## Prerrequisitos
 
 Completar en orden antes de implementar este módulo:
+
 - Stage 5 completo: `produccion-viandas` y `stock-viandas` implementados y con migración aplicada
 - Un `StockVianda` generado para el día (via confirmación de producción)
 - Un `Pedido` en estado `confirmado_pago_online` o `confirmado_pago_presencial` con su `Pago` asociado
@@ -31,6 +32,7 @@ ENTREGA_NOT_FOUND: 'ENTREGA_NOT_FOUND',
 La entidad extiende `BaseEntity` (o su equivalente parcial con `id`, `tenant_id`, `created_at`) pero **sin** `updated_at` ni `deleted_at`.
 
 Índices requeridos:
+
 - `@Unique(['pedido_id'])` — garantiza 1 entrega por pedido
 - `@Index(['tenant_id', 'fecha_entrega', 'sede_id'])` — cubre los filtros de listado
 
@@ -40,7 +42,7 @@ La entidad extiende `BaseEntity` (o su equivalente parcial con `id`, `tenant_id`
 
 **`query-entregas.dto.ts`**: `fecha_desde`, `fecha_hasta` (ISO date), `sede_id`, `punto_retiro_id`, `usuario_id` (UUID), `page`, `limit` — todos opcionales.
 
-**`buscar-por-dni.dto.ts`**: `dni` (string, requerido), `fecha` (ISO date, requerido), `sede_id` (UUID, requerido), `punto_retiro_id` (UUID, opcional).
+**`buscar-por-dni.dto.ts`**: `dni` (string, requerido, mínimo 3 números luego de normalizar), `fecha` (ISO date, requerido), `sede_id` (UUID, requerido), `punto_retiro_id` (UUID, opcional).
 
 ### 4. Implementar el servicio
 
@@ -60,19 +62,30 @@ try {
     .getRepository(Pedido)
     .createQueryBuilder('p')
     .setLock('pessimistic_write')
-    .where('p.id = :id AND p.tenant_id = :tenantId', { id: dto.pedido_id, tenantId })
+    .where('p.id = :id AND p.tenant_id = :tenantId', {
+      id: dto.pedido_id,
+      tenantId,
+    })
     .getOne();
 
-  if (!pedido) throw new AppError({ code: ErrorCodes.PEDIDO_NOT_FOUND, status: 404 });
+  if (!pedido)
+    throw new AppError({ code: ErrorCodes.PEDIDO_NOT_FOUND, status: 404 });
 
   // 2. Validar estado
-  const estadosElegibles = [EstadoPedido.CONFIRMADO_PAGO_ONLINE, EstadoPedido.CONFIRMADO_PAGO_PRESENCIAL];
+  const estadosElegibles = [
+    EstadoPedido.CONFIRMADO_PAGO_ONLINE,
+    EstadoPedido.CONFIRMADO_PAGO_PRESENCIAL,
+  ];
   if (!estadosElegibles.includes(pedido.estado_pedido)) {
-    throw new AppError({ code: ErrorCodes.ENTREGA_PEDIDO_NO_ENTREGABLE, status: 409 });
+    throw new AppError({
+      code: ErrorCodes.ENTREGA_PEDIDO_NO_ENTREGABLE,
+      status: 409,
+    });
   }
 
   // 3. Idempotencia
-  const entregaExistente = await qr.manager.getRepository(EntregaPedido)
+  const entregaExistente = await qr.manager
+    .getRepository(EntregaPedido)
     .findOne({ where: { pedido_id: dto.pedido_id } });
   if (entregaExistente) {
     throw new AppError({ code: ErrorCodes.ENTREGA_YA_REGISTRADA, status: 409 });
@@ -88,19 +101,33 @@ try {
       menu_publicado_id: pedido.menu_publicado_id,
     },
   });
-  if (!stock) throw new AppError({ code: ErrorCodes.STOCK_VIANDA_NOT_FOUND, status: 404 });
+  if (!stock)
+    throw new AppError({
+      code: ErrorCodes.STOCK_VIANDA_NOT_FOUND,
+      status: 404,
+    });
 
   // 5. Consumir stock (transacción interna propia)
-  await this.stockViandasService.consumirParaEntrega(stock.id, pedido.cantidad, pedido.id, tenantId);
+  await this.stockViandasService.consumirParaEntrega(
+    stock.id,
+    pedido.cantidad,
+    pedido.id,
+    tenantId,
+  );
 
   // 6. Pago presencial inline via qr.manager
   let importeCobradoCaja = 0;
   if (pedido.medio_pago === MedioPagoPedido.PRESENCIAL) {
-    const pago = await qr.manager.getRepository(Pago)
+    const pago = await qr.manager
+      .getRepository(Pago)
       .createQueryBuilder('p')
-      .where('p.pedido_id = :pedidoId AND p.tenant_id = :tenantId', { pedidoId: pedido.id, tenantId })
+      .where('p.pedido_id = :pedidoId AND p.tenant_id = :tenantId', {
+        pedidoId: pedido.id,
+        tenantId,
+      })
       .getOne();
-    if (!pago) throw new AppError({ code: ErrorCodes.PAGO_NOT_FOUND, status: 404 });
+    if (!pago)
+      throw new AppError({ code: ErrorCodes.PAGO_NOT_FOUND, status: 404 });
     if (pago.estado !== EstadoPago.PRESENCIAL_PENDIENTE) {
       throw new AppError({ code: ErrorCodes.PAGO_YA_COBRADO, status: 409 });
     }
@@ -126,15 +153,25 @@ try {
     fecha_entrega: new Date(),
     observacion: dto.observacion ?? null,
   });
-  const savedEntrega = await qr.manager.getRepository(EntregaPedido).save(entrega);
+  const savedEntrega = await qr.manager
+    .getRepository(EntregaPedido)
+    .save(entrega);
 
   // 10. Auditoría
   await this.auditService.write('admin', {
     actor_user_id: usuarioId,
     action: 'entrega.registrada',
     entity: 'entrega_pedido',
-    payload: auditLogPayload({ actorUserId: usuarioId, action: 'entrega.registrada', entity: 'entrega_pedido',
-      extra: { entrega_id: savedEntrega.id, pedido_id: pedido.id, importe_cobrado_caja: importeCobradoCaja } }),
+    payload: auditLogPayload({
+      actorUserId: usuarioId,
+      action: 'entrega.registrada',
+      entity: 'entrega_pedido',
+      extra: {
+        entrega_id: savedEntrega.id,
+        pedido_id: pedido.id,
+        importe_cobrado_caja: importeCobradoCaja,
+      },
+    }),
   });
 
   await qr.commitTransaction();
@@ -142,7 +179,6 @@ try {
   // 11. Retornar con pedido
   savedEntrega.pedido = pedido;
   return savedEntrega;
-
 } catch (err) {
   await qr.rollbackTransaction();
   throw err;
@@ -162,14 +198,19 @@ const qb = this.pedidoRepo
   .where('p.tenant_id = :tenantId', { tenantId })
   .andWhere('p.dni_informado ILIKE :dni', { dni: query.dni })
   .andWhere('p.estado_pedido IN (:...estados)', {
-    estados: [EstadoPedido.CONFIRMADO_PAGO_ONLINE, EstadoPedido.CONFIRMADO_PAGO_PRESENCIAL],
+    estados: [
+      EstadoPedido.CONFIRMADO_PAGO_ONLINE,
+      EstadoPedido.CONFIRMADO_PAGO_PRESENCIAL,
+    ],
   })
   .andWhere('p.fecha_retiro = :fecha', { fecha: query.fecha })
   .andWhere('p.sede_id = :sedeId', { sedeId: query.sede_id })
   .andWhere('p.deleted_at IS NULL');
 
 if (query.punto_retiro_id) {
-  qb.andWhere('p.punto_retiro_id = :puntoRetiroId', { puntoRetiroId: query.punto_retiro_id });
+  qb.andWhere('p.punto_retiro_id = :puntoRetiroId', {
+    puntoRetiroId: query.punto_retiro_id,
+  });
 }
 
 return qb.orderBy('p.apellido_informado', 'ASC').getMany();
@@ -223,6 +264,7 @@ npm run db:migration:generate -- migrations/CreateEntregas
 ```
 
 Verificar en el archivo generado:
+
 - Tabla `entrega_pedidos` con todos los campos
 - Constraint `UNIQUE` en `pedido_id`
 - Índice compuesto `(tenant_id, fecha_entrega, sede_id)`
