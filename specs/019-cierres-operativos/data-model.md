@@ -18,6 +18,7 @@
 | `cantidad_pedidos_entregados` | `int` | NOT NULL, default 0 | Pedidos con estado `entregado` al momento del cierre |
 | `cantidad_pedidos_no_retirados` | `int` | NOT NULL, default 0 | Pedidos marcados `no_retirado` en este cierre |
 | `cantidad_ventas_sobrantes` | `int` | NOT NULL, default 0 | Ventas de sobrantes del día |
+| `cantidad_sobrantes_no_vendidos` | `int` | NOT NULL, default 0 | Unidades sobrantes remanentes no vendidas al momento del cierre |
 | `recaudacion_presencial` | `decimal(10,2)` | NOT NULL, default 0 | Suma de efectivo cobrado (entregas + sobrantes) |
 | `observacion` | `text` | nullable | Nota del operador al cerrar |
 | `created_at` | `timestamptz` | NOT NULL, auto | |
@@ -77,6 +78,19 @@ Campos relevantes para el cierre:
 | `punto_retiro_id` | uuid | Filtro |
 | `importe_total` | decimal(10,2) | `SUM` para recaudación presencial |
 
+### StockVianda (src/modules/stock-viandas/entities/stock-vianda.entity.ts)
+
+| Campo | Tipo | Uso en cierre |
+|-------|------|---------------|
+| `tenant_id` | uuid | Filtro |
+| `fecha` | date | Filtro por fecha |
+| `sede_id` | uuid | Filtro |
+| `punto_retiro_id` | uuid | Filtro |
+| `stock_disponible_sobrantes` | int | Base para sobrantes remanentes |
+| `stock_vendido_sobrante` | int | Se resta de los sobrantes disponibles |
+
+`cantidad_sobrantes_no_vendidos` se calcula como `SUM(GREATEST(stock_disponible_sobrantes - stock_vendido_sobrante, 0))`.
+
 ---
 
 ## State Transitions
@@ -107,6 +121,7 @@ El endpoint `GET /resumen-previo` calcula y retorna la siguiente estructura sin 
   cantidad_pedidos_a_no_retirar: number; // confirmados no entregados
   cantidad_pedidos_cancelados: number;
   cantidad_ventas_sobrantes: number;
+  cantidad_sobrantes_no_vendidos: number;
   recaudacion_presencial_estimada: number;
   dia_ya_cerrado: boolean;               // true si ya existe cierre
 }

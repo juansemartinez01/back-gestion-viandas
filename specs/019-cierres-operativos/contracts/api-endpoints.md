@@ -38,6 +38,7 @@ All endpoints require `JwtAuthGuard` + `RolesGuard`. Tenant resolved from JWT co
     "cantidad_pedidos_entregados": 42,
     "cantidad_pedidos_no_retirados": 3,
     "cantidad_ventas_sobrantes": 5,
+    "cantidad_sobrantes_no_vendidos": 2,
     "recaudacion_presencial": "1250.00",
     "observacion": null,
     "created_at": "2026-06-08T23:45:00Z"
@@ -90,6 +91,7 @@ All endpoints require `JwtAuthGuard` + `RolesGuard`. Tenant resolved from JWT co
     "cantidad_pedidos_a_no_retirar": 3,
     "cantidad_pedidos_cancelados": 1,
     "cantidad_ventas_sobrantes": 5,
+    "cantidad_sobrantes_no_vendidos": 2,
     "recaudacion_presencial_estimada": "1250.00",
     "dia_ya_cerrado": false
   }
@@ -130,6 +132,7 @@ All endpoints require `JwtAuthGuard` + `RolesGuard`. Tenant resolved from JWT co
       "cantidad_pedidos_entregados": 42,
       "cantidad_pedidos_no_retirados": 3,
       "cantidad_ventas_sobrantes": 5,
+      "cantidad_sobrantes_no_vendidos": 2,
       "recaudacion_presencial": "1250.00",
       "observacion": null,
       "created_at": "2026-06-08T23:45:00Z"
@@ -171,6 +174,7 @@ All endpoints require `JwtAuthGuard` + `RolesGuard`. Tenant resolved from JWT co
     "cantidad_pedidos_entregados": 42,
     "cantidad_pedidos_no_retirados": 3,
     "cantidad_ventas_sobrantes": 5,
+    "cantidad_sobrantes_no_vendidos": 2,
     "recaudacion_presencial": "1250.00",
     "observacion": null,
     "created_at": "2026-06-08T23:45:00Z"

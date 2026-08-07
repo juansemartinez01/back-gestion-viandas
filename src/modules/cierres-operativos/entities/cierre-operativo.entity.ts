@@ -9,7 +9,11 @@ import {
 
 @Entity('cierres_operativos')
 @Unique(['tenant_id', 'fecha_operativa', 'sede_id', 'punto_retiro_id'])
-@Index('idx_cierre_tenant_fecha_sede', ['tenant_id', 'fecha_operativa', 'sede_id'])
+@Index('idx_cierre_tenant_fecha_sede', [
+  'tenant_id',
+  'fecha_operativa',
+  'sede_id',
+])
 export class CierreOperativo {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
@@ -41,6 +45,9 @@ export class CierreOperativo {
 
   @Column({ type: 'int', default: 0 })
   cantidad_ventas_sobrantes!: number;
+
+  @Column({ type: 'int', default: 0 })
+  cantidad_sobrantes_no_vendidos!: number;
 
   @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
   recaudacion_presencial!: number;

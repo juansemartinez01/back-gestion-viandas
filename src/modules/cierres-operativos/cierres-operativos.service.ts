@@ -10,6 +10,7 @@ import { Pedido } from 'src/modules/pedidos/entities/pedido.entity';
 import { EstadoPedido } from 'src/modules/pedidos/pedido.enums';
 import { EntregaPedido } from 'src/modules/entregas/entities/entrega-pedido.entity';
 import { VentaSobrante } from 'src/modules/ventas-sobrantes/entities/venta-sobrante.entity';
+import { StockVianda } from 'src/modules/stock-viandas/entities/stock-vianda.entity';
 import { CierreOperativo } from './entities/cierre-operativo.entity';
 import { CrearCierreDto } from './dto/crear-cierre.dto';
 import { QueryCierresDto } from './dto/query-cierres.dto';
@@ -31,10 +32,16 @@ export class CierresOperativosService {
     private readonly entregaRepo: Repository<EntregaPedido>,
     @InjectRepository(VentaSobrante)
     private readonly ventaRepo: Repository<VentaSobrante>,
+    @InjectRepository(StockVianda)
+    private readonly stockRepo: Repository<StockVianda>,
     private readonly dataSource: DataSource,
     private readonly tenancyService: TenancyService,
     private readonly auditService: AuditService,
   ) {}
+
+  private sobrantesNoVendidosExpression(alias: string): string {
+    return `GREATEST(${alias}.stock_disponible_sobrantes - ${alias}.stock_vendido_sobrante, 0)`;
+  }
 
   async ejecutarCierre(
     dto: CrearCierreDto,
@@ -58,7 +65,8 @@ export class CierresOperativosService {
       if (cierreExistente) {
         throw new AppError({
           code: ErrorCodes.CIERRE_YA_EXISTE,
-          message: 'Ya existe un cierre operativo para esta fecha, sede y punto de retiro',
+          message:
+            'Ya existe un cierre operativo para esta fecha, sede y punto de retiro',
           status: 409,
           details: {
             fecha_operativa: dto.fecha_operativa,
@@ -75,8 +83,12 @@ export class CierresOperativosService {
         .where('p.tenant_id = :tenantId', { tenantId })
         .andWhere('p.fecha_retiro = :fecha', { fecha: dto.fecha_operativa })
         .andWhere('p.sede_id = :sedeId', { sedeId: dto.sede_id })
-        .andWhere('p.punto_retiro_id = :puntoRetiroId', { puntoRetiroId: dto.punto_retiro_id })
-        .andWhere('p.estado_pedido IN (:...estados)', { estados: ESTADOS_CONFIRMADOS })
+        .andWhere('p.punto_retiro_id = :puntoRetiroId', {
+          puntoRetiroId: dto.punto_retiro_id,
+        })
+        .andWhere('p.estado_pedido IN (:...estados)', {
+          estados: ESTADOS_CONFIRMADOS,
+        })
         .andWhere('p.deleted_at IS NULL')
         .getMany();
 
@@ -89,9 +101,13 @@ export class CierresOperativosService {
         .getRepository(EntregaPedido)
         .createQueryBuilder('ep')
         .where('ep.tenant_id = :tenantId', { tenantId })
-        .andWhere("DATE(ep.fecha_entrega) = :fecha", { fecha: dto.fecha_operativa })
+        .andWhere('DATE(ep.fecha_entrega) = :fecha', {
+          fecha: dto.fecha_operativa,
+        })
         .andWhere('ep.sede_id = :sedeId', { sedeId: dto.sede_id })
-        .andWhere('ep.punto_retiro_id = :puntoRetiroId', { puntoRetiroId: dto.punto_retiro_id })
+        .andWhere('ep.punto_retiro_id = :puntoRetiroId', {
+          puntoRetiroId: dto.punto_retiro_id,
+        })
         .getCount();
 
       const recaudacionEntregas = await qr.manager
@@ -99,9 +115,13 @@ export class CierresOperativosService {
         .createQueryBuilder('ep')
         .select('COALESCE(SUM(ep.importe_cobrado_caja), 0)', 'total')
         .where('ep.tenant_id = :tenantId', { tenantId })
-        .andWhere("DATE(ep.fecha_entrega) = :fecha", { fecha: dto.fecha_operativa })
+        .andWhere('DATE(ep.fecha_entrega) = :fecha', {
+          fecha: dto.fecha_operativa,
+        })
         .andWhere('ep.sede_id = :sedeId', { sedeId: dto.sede_id })
-        .andWhere('ep.punto_retiro_id = :puntoRetiroId', { puntoRetiroId: dto.punto_retiro_id })
+        .andWhere('ep.punto_retiro_id = :puntoRetiroId', {
+          puntoRetiroId: dto.punto_retiro_id,
+        })
         .getRawOne<{ total: string }>();
 
       const cantidadVentasSobrantes = await qr.manager
@@ -110,7 +130,9 @@ export class CierresOperativosService {
         .where('vs.tenant_id = :tenantId', { tenantId })
         .andWhere('vs.fecha = :fecha', { fecha: dto.fecha_operativa })
         .andWhere('vs.sede_id = :sedeId', { sedeId: dto.sede_id })
-        .andWhere('vs.punto_retiro_id = :puntoRetiroId', { puntoRetiroId: dto.punto_retiro_id })
+        .andWhere('vs.punto_retiro_id = :puntoRetiroId', {
+          puntoRetiroId: dto.punto_retiro_id,
+        })
         .getCount();
 
       const recaudacionSobrantes = await qr.manager
@@ -120,7 +142,24 @@ export class CierresOperativosService {
         .where('vs.tenant_id = :tenantId', { tenantId })
         .andWhere('vs.fecha = :fecha', { fecha: dto.fecha_operativa })
         .andWhere('vs.sede_id = :sedeId', { sedeId: dto.sede_id })
-        .andWhere('vs.punto_retiro_id = :puntoRetiroId', { puntoRetiroId: dto.punto_retiro_id })
+        .andWhere('vs.punto_retiro_id = :puntoRetiroId', {
+          puntoRetiroId: dto.punto_retiro_id,
+        })
+        .getRawOne<{ total: string }>();
+
+      const sobrantesNoVendidos = await qr.manager
+        .getRepository(StockVianda)
+        .createQueryBuilder('sv')
+        .select(
+          `COALESCE(SUM(${this.sobrantesNoVendidosExpression('sv')}), 0)`,
+          'total',
+        )
+        .where('sv.tenant_id = :tenantId', { tenantId })
+        .andWhere('sv.fecha = :fecha', { fecha: dto.fecha_operativa })
+        .andWhere('sv.sede_id = :sedeId', { sedeId: dto.sede_id })
+        .andWhere('sv.punto_retiro_id = :puntoRetiroId', {
+          puntoRetiroId: dto.punto_retiro_id,
+        })
         .getRawOne<{ total: string }>();
 
       const recaudacionTotal =
@@ -137,10 +176,13 @@ export class CierresOperativosService {
         cantidad_pedidos_entregados: cantidadEntregados,
         cantidad_pedidos_no_retirados: pedidos.length,
         cantidad_ventas_sobrantes: cantidadVentasSobrantes,
+        cantidad_sobrantes_no_vendidos: Number(sobrantesNoVendidos?.total ?? 0),
         recaudacion_presencial: recaudacionTotal,
         observacion: dto.observacion ?? null,
       });
-      const savedCierre = await qr.manager.getRepository(CierreOperativo).save(cierre);
+      const savedCierre = await qr.manager
+        .getRepository(CierreOperativo)
+        .save(cierre);
 
       await this.auditService.write('admin', {
         actor_user_id: usuarioId,
@@ -157,6 +199,9 @@ export class CierresOperativosService {
             punto_retiro_id: dto.punto_retiro_id,
             cantidad_pedidos_no_retirados: pedidos.length,
             cantidad_pedidos_entregados: cantidadEntregados,
+            cantidad_sobrantes_no_vendidos: Number(
+              sobrantesNoVendidos?.total ?? 0,
+            ),
             recaudacion_presencial: recaudacionTotal,
           },
         }),
@@ -197,6 +242,7 @@ export class CierresOperativosService {
     cantidad_pedidos_a_no_retirar: number;
     cantidad_pedidos_cancelados: number;
     cantidad_ventas_sobrantes: number;
+    cantidad_sobrantes_no_vendidos: number;
     recaudacion_presencial_estimada: number;
     dia_ya_cerrado: boolean;
   }> {
@@ -212,9 +258,11 @@ export class CierresOperativosService {
     const cantidadEntregados = await this.entregaRepo
       .createQueryBuilder('ep')
       .where('ep.tenant_id = :tenantId', { tenantId })
-      .andWhere("DATE(ep.fecha_entrega) = :fecha", { fecha: query.fecha })
+      .andWhere('DATE(ep.fecha_entrega) = :fecha', { fecha: query.fecha })
       .andWhere('ep.sede_id = :sedeId', { sedeId: query.sede_id })
-      .andWhere('ep.punto_retiro_id = :puntoRetiroId', { puntoRetiroId: query.punto_retiro_id })
+      .andWhere('ep.punto_retiro_id = :puntoRetiroId', {
+        puntoRetiroId: query.punto_retiro_id,
+      })
       .getCount();
 
     const cantidadANoRetirar = await this.pedidoRepo
@@ -222,8 +270,12 @@ export class CierresOperativosService {
       .where('p.tenant_id = :tenantId', { tenantId })
       .andWhere('p.fecha_retiro = :fecha', { fecha: query.fecha })
       .andWhere('p.sede_id = :sedeId', { sedeId: query.sede_id })
-      .andWhere('p.punto_retiro_id = :puntoRetiroId', { puntoRetiroId: query.punto_retiro_id })
-      .andWhere('p.estado_pedido IN (:...estados)', { estados: ESTADOS_CONFIRMADOS })
+      .andWhere('p.punto_retiro_id = :puntoRetiroId', {
+        puntoRetiroId: query.punto_retiro_id,
+      })
+      .andWhere('p.estado_pedido IN (:...estados)', {
+        estados: ESTADOS_CONFIRMADOS,
+      })
       .andWhere('p.deleted_at IS NULL')
       .getCount();
 
@@ -232,7 +284,9 @@ export class CierresOperativosService {
       .where('p.tenant_id = :tenantId', { tenantId })
       .andWhere('p.fecha_retiro = :fecha', { fecha: query.fecha })
       .andWhere('p.sede_id = :sedeId', { sedeId: query.sede_id })
-      .andWhere('p.punto_retiro_id = :puntoRetiroId', { puntoRetiroId: query.punto_retiro_id })
+      .andWhere('p.punto_retiro_id = :puntoRetiroId', {
+        puntoRetiroId: query.punto_retiro_id,
+      })
       .andWhere('p.estado_pedido = :estado', { estado: EstadoPedido.CANCELADO })
       .andWhere('p.deleted_at IS NULL')
       .getCount();
@@ -242,16 +296,20 @@ export class CierresOperativosService {
       .where('vs.tenant_id = :tenantId', { tenantId })
       .andWhere('vs.fecha = :fecha', { fecha: query.fecha })
       .andWhere('vs.sede_id = :sedeId', { sedeId: query.sede_id })
-      .andWhere('vs.punto_retiro_id = :puntoRetiroId', { puntoRetiroId: query.punto_retiro_id })
+      .andWhere('vs.punto_retiro_id = :puntoRetiroId', {
+        puntoRetiroId: query.punto_retiro_id,
+      })
       .getCount();
 
     const recaudacionEntregas = await this.entregaRepo
       .createQueryBuilder('ep')
       .select('COALESCE(SUM(ep.importe_cobrado_caja), 0)', 'total')
       .where('ep.tenant_id = :tenantId', { tenantId })
-      .andWhere("DATE(ep.fecha_entrega) = :fecha", { fecha: query.fecha })
+      .andWhere('DATE(ep.fecha_entrega) = :fecha', { fecha: query.fecha })
       .andWhere('ep.sede_id = :sedeId', { sedeId: query.sede_id })
-      .andWhere('ep.punto_retiro_id = :puntoRetiroId', { puntoRetiroId: query.punto_retiro_id })
+      .andWhere('ep.punto_retiro_id = :puntoRetiroId', {
+        puntoRetiroId: query.punto_retiro_id,
+      })
       .getRawOne<{ total: string }>();
 
     const recaudacionSobrantes = await this.ventaRepo
@@ -260,7 +318,23 @@ export class CierresOperativosService {
       .where('vs.tenant_id = :tenantId', { tenantId })
       .andWhere('vs.fecha = :fecha', { fecha: query.fecha })
       .andWhere('vs.sede_id = :sedeId', { sedeId: query.sede_id })
-      .andWhere('vs.punto_retiro_id = :puntoRetiroId', { puntoRetiroId: query.punto_retiro_id })
+      .andWhere('vs.punto_retiro_id = :puntoRetiroId', {
+        puntoRetiroId: query.punto_retiro_id,
+      })
+      .getRawOne<{ total: string }>();
+
+    const sobrantesNoVendidos = await this.stockRepo
+      .createQueryBuilder('sv')
+      .select(
+        `COALESCE(SUM(${this.sobrantesNoVendidosExpression('sv')}), 0)`,
+        'total',
+      )
+      .where('sv.tenant_id = :tenantId', { tenantId })
+      .andWhere('sv.fecha = :fecha', { fecha: query.fecha })
+      .andWhere('sv.sede_id = :sedeId', { sedeId: query.sede_id })
+      .andWhere('sv.punto_retiro_id = :puntoRetiroId', {
+        puntoRetiroId: query.punto_retiro_id,
+      })
       .getRawOne<{ total: string }>();
 
     const recaudacionTotal =
@@ -275,6 +349,7 @@ export class CierresOperativosService {
       cantidad_pedidos_a_no_retirar: cantidadANoRetirar,
       cantidad_pedidos_cancelados: cantidadCancelados,
       cantidad_ventas_sobrantes: cantidadVentasSobrantes,
+      cantidad_sobrantes_no_vendidos: Number(sobrantesNoVendidos?.total ?? 0),
       recaudacion_presencial_estimada: recaudacionTotal,
       dia_ya_cerrado: diaYaCerrado,
     };
@@ -296,10 +371,14 @@ export class CierresOperativosService {
       .where('c.tenant_id = :tenantId', { tenantId });
 
     if (query.fecha_desde) {
-      qb.andWhere('c.fecha_operativa >= :fechaDesde', { fechaDesde: query.fecha_desde });
+      qb.andWhere('c.fecha_operativa >= :fechaDesde', {
+        fechaDesde: query.fecha_desde,
+      });
     }
     if (query.fecha_hasta) {
-      qb.andWhere('c.fecha_operativa <= :fechaHasta', { fechaHasta: query.fecha_hasta });
+      qb.andWhere('c.fecha_operativa <= :fechaHasta', {
+        fechaHasta: query.fecha_hasta,
+      });
     }
     if (query.sede_id) {
       qb.andWhere('c.sede_id = :sedeId', { sedeId: query.sede_id });
